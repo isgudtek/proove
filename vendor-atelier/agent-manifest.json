@@ -139,12 +139,14 @@
       "manifest",
       "getState",
       "run",
-      "callTool"
+      "callTool",
+      "useSettings"
     ],
     "trusted_origins": [
       "http://localhost:62274"
     ],
-    "consent": "Untrusted origins are asked once. confirm_sale always pauses for the vendor owner's approval."
+    "consent": "Untrusted origins are asked once. confirm_sale always pauses for the vendor owner's approval.",
+    "use_settings": "useSettings lets the buyer hub lend its model settings for this page session (memory only). Saving or deleting settings on this site ends the loan."
   },
   "window_api": "window.OpenAgenticWeb",
   "llm": {

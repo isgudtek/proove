@@ -2,7 +2,7 @@
  * Proove vendor storefront (one codebase; vendor-<id>/ supplies shop.json, manifest, network, vault and theme).
  * curator_agent -> prover_agent (zero-knowledge, in this browser) -> sales_agent.
  */
-import { AgentRuntime, serveRpc, exposeGlobal, fetchJson, OawError, uid } from "../shared/oaw-core.js";
+import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, fetchJson, OawError, uid } from "../shared/oaw-core.js";
 import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js";
 import { CATEGORIES, listingField } from "../shared/merkle.js";
 import { safeImage } from "../shared/image-search.js";
@@ -262,7 +262,8 @@ const tools = {
   },
 };
 
-const runtime = new AgentRuntime({ site: shop.id, manifest, network, agentImpl, tools, settingsKey: shop.settings_key, approve });
+const lender = lendableStorage(shop.settings_key); // the buyer hub can lend its model settings (useSettings)
+const runtime = new AgentRuntime({ site: shop.id, manifest, network, agentImpl, tools, settingsKey: shop.settings_key, approve, storage: lender.storage });
 runtime.on((e) => stream.add(e));
 createStatusPill($("#pill"), runtime);
 const settings = createSettings({ runtime });
@@ -279,6 +280,13 @@ serveRpc({
     ping: () => ({ site: shop.id, name: shop.name, ready: true, provider: runtime.describeProvider().label }),
     manifest: () => manifest,
     getState: () => getState(),
+    useSettings: ({ settings, from }) => {
+      lender.lend(settings, from);
+      const d = runtime.describeProvider();
+      runtime.emit({ type: "provider", provider: d });
+      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}${settings.otari?.apiKey ? " (key lent, not saved here)" : ""}` : "Back to this site's own model settings." });
+      return { applied: true, provider: d.label, mode: d.mode };
+    },
     run: ({ requirements }, ctx) => runtime.callTool("request_offers", { requirements: requirements || {} }, ctx),
     callTool: ({ tool, args }, ctx) => runtime.callTool(String(tool), args || {}, ctx),
   },

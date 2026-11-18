@@ -153,6 +153,27 @@ export function saveSettings(key, s, storage = globalThis.localStorage) {
 }
 export function clearSettings(key, storage = globalThis.localStorage) { storage?.removeItem(key); }
 
+/**
+ * Storage for AgentRuntime that can use another site's model settings for this page session only (memory, never saved).
+ * The buyer hub lends its settings to the sites it opens. Saving or deleting settings on this site ends the loan.
+ */
+export function lendableStorage(key, base = globalThis.localStorage) {
+  let lent = null; // { settings, from }
+  const clean = (s) => ({
+    mode: MODES.includes(s?.mode) ? s.mode : null,
+    otari: { baseUrl: String(s?.otari?.baseUrl || OTARI_REGIONS.global).slice(0, 200), apiKey: String(s?.otari?.apiKey || "").slice(0, 400), model: String(s?.otari?.model || OTARI_MODELS[0]).slice(0, 120) },
+  });
+  return {
+    storage: {
+      getItem: (k) => (k === key && lent ? JSON.stringify(lent.settings) : base?.getItem(k) ?? null),
+      setItem: (k, v) => { if (k === key) lent = null; base?.setItem(k, v); },
+      removeItem: (k) => { if (k === key) lent = null; base?.removeItem(k); },
+    },
+    lend(settings, from) { lent = settings ? { settings: clean(settings), from: String(from || "another site").slice(0, 80) } : null; },
+    get from() { return lent?.from || null; },
+  };
+}
+
 /* --------------------------------------------------------------- providers */
 
 /** Demo Mode: each agent's deterministic implementation. No model, no network. */

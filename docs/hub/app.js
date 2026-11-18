@@ -4,12 +4,12 @@
  * -> verifier_agent (zero-knowledge proof + registry checks, deterministic) -> buyer choice -> negotiator_agent
  * -> place_order (your approval) -> vendor confirm_sale (vendor's approval) -> registry record_transfer (registry's approval).
  */
-import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=ca5ca22601";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=ca5ca22601";
-import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=ca5ca22601";
-import { findImage, preload } from "../shared/image-search.js?v=ca5ca22601";
-import { createFlow } from "./flow.js?v=ca5ca22601";
-import * as H from "./hub-logic.js?v=ca5ca22601";
+import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=c8a3d2e978";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=c8a3d2e978";
+import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=c8a3d2e978";
+import { findImage, preload } from "../shared/image-search.js?v=c8a3d2e978";
+import { createFlow } from "./flow.js?v=c8a3d2e978";
+import * as H from "./hub-logic.js?v=c8a3d2e978";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
@@ -53,7 +53,7 @@ const consent = createConsent();
 /* --------------------------------------------------------- zero knowledge */
 
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=ca5ca22601"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=c8a3d2e978"));
 let zkReady = null;
 function warmZk() {
   zkReady ??= (async () => {
@@ -95,7 +95,11 @@ function frameFor(url) {
   return f;
 }
 function openSplit(urls) {
-  for (const u of [].concat(urls)) frameFor(u);
+  for (const u of [].concat(urls)) {
+    const fresh = !frames.has(trimUrl(u));
+    frameFor(u);
+    if (fresh) setTimeout(() => peer(u).catch(() => {}), 0); // connect at once, so the site takes the hub's model settings
+  }
   $("#splitFrame").dataset.count = String(frames.size);
   $("#splitTitle").textContent = `${frames.size} site${frames.size > 1 ? "s" : ""}, each running its own agents`;
   document.body.classList.add("split-on");
@@ -153,9 +157,21 @@ async function peer(url) {
     c.ready = true;
     runtime.emit({ type: "rpc", direction: "out", method: "ping", origin: key, ms: Math.round(performance.now() - t0), ok: true });
     runtime.emit({ type: "note", text: `Connected to ${info.name} (${host(key)}) · it runs its own agents with: ${info.provider}` });
+    await lendSettings(key, c);
   }
   return c;
 }
+
+/* Simulation: every site in the split view runs its agents with the hub's model settings (mode, model and key). */
+const hubSettings = () => { const s = runtime.settings; return { mode: s.mode, otari: { ...s.otari } }; };
+async function lendSettings(key, c = clients.get(key)) {
+  if (!c?.ready) return;
+  try {
+    const r = await c.call("useSettings", { settings: hubSettings(), from: manifest.name }, { timeout: 8000 });
+    runtime.emit({ type: "note", text: `${shortName(key)} now uses the hub's model settings: ${r.provider}` });
+  } catch (e) { runtime.emit({ type: "note", text: `${shortName(key)} kept its own model settings (${e.message})` }); }
+}
+const lendAll = () => { for (const [key, c] of clients) if (c.ready && frames.has(key)) lendSettings(key, c); };
 
 async function rpc(url, method, params) {
   const key = trimUrl(url);
@@ -655,7 +671,7 @@ for (const ex of [
 /* ---------------------------------------------------- settings + inspector */
 
 createStatusPill($("#pill"), runtime);
-const settings = createSettings({ runtime });
+const settings = createSettings({ runtime, onSaved: () => lendAll() });
 $("#settingsBtn").addEventListener("click", () => settings.open());
 const inspector = createInspector({
   getEntries: () => [

@@ -1,7 +1,7 @@
 /**
  * oaw-ui.js: shared UI for both sites. All model/peer text is rendered with textContent, never as HTML.
  */
-import { OTARI_REGIONS, OTARI_MODELS, validateManifest, testOtari, listOtariModels, cleanApiKey } from "./oaw-core.js?v=ca5ca22601";
+import { OTARI_REGIONS, OTARI_MODELS, validateManifest, testOtari, listOtariModels, cleanApiKey } from "./oaw-core.js?v=c8a3d2e978";
 
 export function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
@@ -228,7 +228,7 @@ export function createSettings({ runtime, onSaved }) {
     h("legend", { text: "Gemini Nano" }),
     h("p", {}, "On this device: ", nanoChip), nanoBar, nanoInit,
     h("p", { class: "oaw-muted small", text: "Needs desktop Chrome with built-in AI (about 22 GB free disk, a GPU with more than 4 GB VRAM or 16 GB RAM). Check chrome://on-device-internals. When it is unavailable, Nano mode runs the labeled \"Gemini Nano (Local Sim)\" profile: scripted answers with simulated latency, marked \"simulated\" in every trace." }));
-  const demoPanel = h("fieldset", { class: "oaw-panel" }, h("legend", { text: "Demo Mode" }), h("p", { class: "oaw-muted small", text: "Every agent uses its deterministic implementation. Approvals, cross-site RPC, the 3D preview and the boards behave exactly as with a real model." }));
+  const demoPanel = h("fieldset", { class: "oaw-panel" }, h("legend", { text: "Demo Mode" }), h("p", { class: "oaw-muted small", text: "Every agent uses its deterministic implementation. Approvals, cross-site RPC, proofs and verification behave exactly as with a real model." }));
   dlg.replaceChildren(h("form", { class: "oaw-modal-body", method: "dialog" },
     h("h2", { text: "Model settings" }),
     h("p", { class: "oaw-muted", text: `${runtime.manifest?.name || ""}: you choose who runs the agents. The site host pays for nothing.` }),

@@ -122,7 +122,8 @@
       "callTool"
     ],
     "trusted_origins": [],
-    "consent": "Every other origin is asked once. place_order always pauses for approval on this site."
+    "consent": "Every other origin is asked once. place_order always pauses for approval on this site.",
+    "lends_settings": "The hub lends its model settings (mode, Otari base URL, model and key) to the registry and vendor sites it opens, over the useSettings RPC method. Demo simulation: the sites keep them in memory only."
   },
   "window_api": "window.OpenAgenticWeb",
   "llm": {

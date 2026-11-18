@@ -2,7 +2,7 @@
  * zk-client.js: browser prover and verifier for Proove (Noir circuits + Barretenberg UltraHonk).
  * Everything is self-hosted under shared/zk/ (circuits, WASM, workers, CRS). Loaded lazily: call warmUp() early.
  */
-import { PUBLIC_INPUTS, b64, leafInputs } from "./merkle.js?v=ca5ca22601";
+import { PUBLIC_INPUTS, b64, leafInputs } from "./merkle.js?v=c8a3d2e978";
 
 const base = new URL("./zk/", import.meta.url);
 let ready = null;

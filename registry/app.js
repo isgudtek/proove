@@ -2,7 +2,7 @@
  * Proove Artifact Registry: publishes the commitment root and verification key, answers custody checks,
  * and records custody transfers (with the registry owner's approval).
  */
-import { AgentRuntime, serveRpc, exposeGlobal, OawError } from "../shared/oaw-core.js";
+import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, OawError } from "../shared/oaw-core.js";
 import { h, $, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
@@ -88,7 +88,8 @@ const agentImpl = {
   },
 };
 
-const runtime = new AgentRuntime({ site: "registry", manifest, network, agentImpl, tools, settingsKey: "proove.registry.settings.v1", approve });
+const lender = lendableStorage("proove.registry.settings.v1"); // the buyer hub can lend its model settings (useSettings)
+const runtime = new AgentRuntime({ site: "registry", manifest, network, agentImpl, tools, settingsKey: "proove.registry.settings.v1", approve, storage: lender.storage });
 runtime.on((e) => stream.add(e));
 createStatusPill($("#pill"), runtime);
 const settings = createSettings({ runtime });
@@ -105,6 +106,13 @@ serveRpc({
     ping: () => ({ site: "registry", name: manifest.name, ready: true, provider: "deterministic registry clerk" }),
     manifest: () => manifest,
     getState: () => getState(),
+    useSettings: ({ settings, from }) => {
+      lender.lend(settings, from);
+      const d = runtime.describeProvider();
+      runtime.emit({ type: "provider", provider: d });
+      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}${settings.otari?.apiKey ? " (key lent, not saved here)" : ""}` : "Back to this site's own model settings." });
+      return { applied: true, provider: d.label, mode: d.mode };
+    },
     run: ({ nullifier }, ctx) => runtime.runAgent("registry_clerk", { nullifier }, { from: ctx.origin }),
     callTool: ({ tool, args }, ctx) => runtime.callTool(String(tool), args || {}, ctx),
   },
