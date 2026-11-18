@@ -2,8 +2,8 @@
  * Proove Artifact Registry: publishes the commitment root and verification key, answers custody checks,
  * and records custody transfers (with the registry owner's approval).
  */
-import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, OawError } from "../shared/oaw-core.js?v=364e880711";
-import { h, $, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=364e880711";
+import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, OawError } from "../shared/oaw-core.js?v=2cca5cc777";
+import { h, $, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=2cca5cc777";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const embedded = window.parent !== window || new URLSearchParams(location.search).has("embedded");

@@ -4,12 +4,12 @@
  * -> verifier_agent (zero-knowledge proof + registry checks, deterministic) -> buyer choice -> negotiator_agent
  * -> place_order (your approval) -> vendor confirm_sale (vendor's approval) -> registry record_transfer (registry's approval).
  */
-import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=364e880711";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=364e880711";
-import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=364e880711";
-import { findImage, preload } from "../shared/image-search.js?v=364e880711";
-import { createFlow } from "./flow.js?v=364e880711";
-import * as H from "./hub-logic.js?v=364e880711";
+import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=2cca5cc777";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=2cca5cc777";
+import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=2cca5cc777";
+import { findImage, preload } from "../shared/image-search.js?v=2cca5cc777";
+import { createFlow } from "./flow.js?v=2cca5cc777";
+import * as H from "./hub-logic.js?v=2cca5cc777";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
@@ -53,7 +53,7 @@ const consent = createConsent();
 /* --------------------------------------------------------- zero knowledge */
 
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=364e880711"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=2cca5cc777"));
 let zkReady = null;
 function warmZk() {
   zkReady ??= (async () => {

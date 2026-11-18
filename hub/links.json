@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "networks": {
+    "proove_hub": {
+      "registry_clerk_network": "http://localhost:62270/proove_registry",
+      "northlight_vendor": "http://localhost:62271/northlight_vendor",
+      "atelier_vendor": "http://localhost:62272/atelier_vendor",
+      "shady_vendor": "http://localhost:62273/shady_vendor"
+    }
+  }
+}

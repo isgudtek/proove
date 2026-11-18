@@ -177,5 +177,10 @@
     "inbound": "postMessage RPC with origin checks",
     "outbound": "fetches the registry's public data"
   },
-  "demo_notice": "Deliberately dishonest vendor for the demonstration. Its offers fail the buyer's verification."
+  "demo_notice": "Deliberately dishonest vendor for the demonstration. Its offers fail the buyer's verification.",
+  "links": "links.json",
+  "private_context": {
+    "policy": "deny_by_default",
+    "allowed_fields": []
+  }
 }

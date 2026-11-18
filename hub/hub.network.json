@@ -4,6 +4,11 @@
     "description": "Proove Buyer Hub: turns a request for a unique artifact into requirements, discovers vendors through their manifests, collects offers that each carry a zero-knowledge proof of possession, verifies every proof against the registry, lets the buyer choose, negotiates and orders. Every write pauses for human approval.",
     "limits": {
       "max_negotiation_rounds": 3
+    },
+    "private_context": {
+      "policy": "deny_by_default",
+      "allowed_fields": [],
+      "note": "Private context (credentials, session data) never passes to another network or site. Only fields named here may pass."
     }
   },
   "tools": [

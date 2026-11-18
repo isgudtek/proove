@@ -176,5 +176,10 @@
     "mode": "open",
     "inbound": "postMessage RPC with origin checks",
     "outbound": "fetches the registry's public data"
+  },
+  "links": "links.json",
+  "private_context": {
+    "policy": "deny_by_default",
+    "allowed_fields": []
   }
 }

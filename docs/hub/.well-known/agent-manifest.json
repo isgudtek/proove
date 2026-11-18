@@ -153,5 +153,10 @@
     "mode": "open",
     "outbound": "consent per origin before the first contact",
     "inbound": "postMessage RPC with origin checks and consent"
+  },
+  "links": "links.json",
+  "private_context": {
+    "policy": "deny_by_default",
+    "allowed_fields": []
   }
 }

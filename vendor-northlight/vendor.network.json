@@ -1,7 +1,12 @@
 {
   "metadata": {
     "name": "northlight_vendor",
-    "description": "Northlight Collectibles: matches buyer requests to certified items, proves possession of each offered item in zero knowledge, and negotiates within the vendor's price floor."
+    "description": "Northlight Collectibles: matches buyer requests to certified items, proves possession of each offered item in zero knowledge, and negotiates within the vendor's price floor.",
+    "private_context": {
+      "policy": "deny_by_default",
+      "allowed_fields": [],
+      "note": "Private context (credentials, session data) never passes to another network or site. Only fields named here may pass."
+    }
   },
   "tools": [
     {

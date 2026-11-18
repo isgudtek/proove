@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "networks": {
+    "proove_hub": {
+      "registry_clerk_network": "https://isgudtek.github.io/proove/registry/proove_registry",
+      "northlight_vendor": "https://isgudtek.github.io/proove/vendor-northlight/northlight_vendor",
+      "atelier_vendor": "https://isgudtek.github.io/proove/vendor-atelier/atelier_vendor",
+      "shady_vendor": "https://isgudtek.github.io/proove/vendor-shady/shady_vendor"
+    }
+  }
+}
