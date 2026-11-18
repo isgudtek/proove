@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "name": "proove_registry",
+    "description": "Proove Artifact Registry: certifies unique artifacts, publishes the commitment root and the verification key of the possession circuit, answers custody checks and records ownership transfers after a sale."
+  },
+  "tools": [
+    {
+      "name": "registry_clerk",
+      "rule_based": true,
+      "function": {
+        "description": "Front agent. Answers registry questions (current root, verification key, custody of a nullifier) and records custody transfers. Deterministic: no model is involved, so a registry answer never depends on an LLM.",
+        "parameters": { "type": "object", "properties": { "nullifier": { "type": "string" }, "question": { "type": "string" } } }
+      },
+      "instructions": "Answer from the registry ledger only. Never reveal item secrets. A custody transfer needs the current holder's sale receipt and the registry owner's approval.",
+      "tools": ["get_registry", "check_custody", "record_transfer"]
+    }
+  ]
+}

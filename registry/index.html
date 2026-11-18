@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proove Artifact Registry</title>
+  <meta name="description" content="Independent registry of certified unique artifacts. Publishes a commitment root and a zero-knowledge verification key; buyers verify vendors' possession proofs in their browser.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+  <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0d11'/%3E%3Cpath d='M16 5l9 4v7c0 5-4 9-9 11-5-2-9-6-9-11V9z' fill='none' stroke='%23c8a6ff' stroke-width='2.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../shared/oaw-ui.css">
+  <link rel="stylesheet" href="../shared/proove.css">
+  <link rel="stylesheet" href="registry.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div>
+        <h1>Proove Artifact Registry</h1>
+        <p class="sub">Independent certification of unique artifacts · zero-knowledge custody</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="pill" class="oaw-pill" role="status" aria-live="polite">Loading…</span>
+      <button id="manifestBtn" class="oaw-btn" type="button">Manifest Inspector</button>
+      <button id="settingsBtn" class="oaw-btn" type="button">Model settings</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="main">
+      <section class="panel" aria-label="Registry">
+        <p class="kicker">What this registry publishes</p>
+        <dl id="facts" class="kv"></dl>
+        <p class="oaw-muted small">The registry never publishes which items exist or their codes. It publishes one commitment root, the circuit's verification key and, per item, a nullifier with its registered holder. A vendor's proof shows it knows the code of one certified item; the nullifier shows which holder record that proof belongs to.</p>
+      </section>
+
+      <section class="panel" aria-label="Custody ledger">
+        <h2 class="ph">Custody ledger <span id="custodyCount" class="oaw-muted small"></span></h2>
+        <table class="ledger"><thead><tr><th>Nullifier</th><th>Registered holder</th><th>Status</th><th>Last change</th></tr></thead><tbody id="custody"></tbody></table>
+      </section>
+    </main>
+    <aside id="stream" class="oaw-stream stream" aria-label="Agent Network Execution Stream"></aside>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

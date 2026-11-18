@@ -1,0 +1,112 @@
+{
+  "note": "Demo vault. A real vendor keeps item codes private (device storage, HSM or the tag itself); a static demo site can only ship them as a file.",
+  "vendor": "northlight",
+  "root": "0x05ec4ca9978acd2dc5ee82ea20f98a439906fcef213fcba264e4a3e8154a947e",
+  "items": [
+    {
+      "id": "NL-MET-01",
+      "title": "Iron meteorite fragment, Campo del Cielo strewn field",
+      "category": "meteorite",
+      "category_code": 1,
+      "measure": 72,
+      "cert_year": 2019,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 560,
+      "floor": 500,
+      "shape": "meteorite",
+      "secret": "0x9f5a72ec7cb50db0a82ea6cdb4a167c0a67d36237e0c6c888531b19c7ba1ea",
+      "index": 0,
+      "path": [
+        "0x031455f7f8311043a72119f398717b82cb671a62edf58e6ad4bafcc7d1127884",
+        "0x01c66e4afdac2642297ff08afdce17f67a46df89d6865e0131d35efc4d9f74fe",
+        "0x126fafbeddf8c6a030a2d63533dc605a9a61af80c5d9276306699bfae42d9659",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "NL-COI-02",
+      "title": "Gold trade coin, struck 1907",
+      "category": "coin",
+      "category_code": 4,
+      "measure": 33,
+      "cert_year": 2020,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 2400,
+      "floor": 2200,
+      "shape": "coin",
+      "secret": "0x739a42c4152ca9567bd9b700873b469cc2f0d8f2172fe337209f184e902305",
+      "index": 1,
+      "path": [
+        "0x1b185bc8253c4306388e24ee55704e2691634c3cac94f875b0fff770a10f5ae8",
+        "0x01c66e4afdac2642297ff08afdce17f67a46df89d6865e0131d35efc4d9f74fe",
+        "0x126fafbeddf8c6a030a2d63533dc605a9a61af80c5d9276306699bfae42d9659",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "NL-DOC-03",
+      "title": "Polar expedition logbook page, 1911",
+      "category": "document",
+      "category_code": 6,
+      "measure": 1,
+      "cert_year": 2021,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 1800,
+      "floor": 1650,
+      "shape": "document",
+      "secret": "0x8dc846b4459fedb70f1986893a83519cd65de4308e07a3cda6811098c3e679",
+      "index": 2,
+      "path": [
+        "0x19dff068462630d857a7cea1db502c1d41a0cf203a3dc94a77c5ad49b82e357d",
+        "0x1eb0c70928e76d5daea2f1cb9c9e6ac36a8fdfdae8ef999275d137c9ef92f02f",
+        "0x126fafbeddf8c6a030a2d63533dc605a9a61af80c5d9276306699bfae42d9659",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  ]
+}

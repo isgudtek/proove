@@ -1,0 +1,147 @@
+{
+  "note": "Demo vault. A real vendor keeps item codes private (device storage, HSM or the tag itself); a static demo site can only ship them as a file.",
+  "vendor": "atelier",
+  "root": "0x05ec4ca9978acd2dc5ee82ea20f98a439906fcef213fcba264e4a3e8154a947e",
+  "items": [
+    {
+      "id": "AU-MET-01",
+      "title": "Pallasite slice with olivine crystals",
+      "category": "meteorite",
+      "category_code": 1,
+      "measure": 58,
+      "cert_year": 2021,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 640,
+      "floor": 560,
+      "shape": "pallasite",
+      "secret": "0xeba1cd355d8e41ffdba137775853f869d01457c9e85ebde73e7135016b26b2",
+      "index": 3,
+      "path": [
+        "0x27c35d09f76bf2802344c44b36330c8283a0940182d472927df83ea1e5cb36dc",
+        "0x1eb0c70928e76d5daea2f1cb9c9e6ac36a8fdfdae8ef999275d137c9ef92f02f",
+        "0x126fafbeddf8c6a030a2d63533dc605a9a61af80c5d9276306699bfae42d9659",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "AU-MIN-02",
+      "title": "Rhodochrosite crystal cluster",
+      "category": "mineral",
+      "category_code": 2,
+      "measure": 120,
+      "cert_year": 2022,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 900,
+      "floor": 820,
+      "shape": "crystal",
+      "secret": "0x304882382b101e2cf5a4a48012520a5d670f5361bc12541f91c05a8b254483",
+      "index": 4,
+      "path": [
+        "0x2412f0be4a4d1324bde200c78a4f82f48b86db2330941ea066f931f809a211f2",
+        "0x0d1d2af175d9b7ed170722d188c435e7f0aa48fed3a2015a7f0bed5ebf024b2b",
+        "0x06f440babef6f373634ebb52762ffad427b34d766c8beccb58bd11bca824b373",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "AU-ART-03",
+      "title": "Stone lithograph, edition 12 of 50",
+      "category": "artwork",
+      "category_code": 5,
+      "measure": 1,
+      "cert_year": 2023,
+      "edition_no": 12,
+      "edition_size": 50,
+      "list": 1200,
+      "floor": 1080,
+      "shape": "artwork",
+      "secret": "0x200358f6d325eba50c87f9d5acbb6c0e07b917fe1dd3b09c3a8083fb8c2c00",
+      "index": 5,
+      "path": [
+        "0x030e38a9011b771659d8b7c5cd121abf221796f3a35d35a5a35a0a43d3351ac6",
+        "0x0d1d2af175d9b7ed170722d188c435e7f0aa48fed3a2015a7f0bed5ebf024b2b",
+        "0x06f440babef6f373634ebb52762ffad427b34d766c8beccb58bd11bca824b373",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "AU-MET-04",
+      "title": "Native gold nugget",
+      "category": "precious_metal",
+      "category_code": 3,
+      "measure": 31,
+      "cert_year": 2020,
+      "edition_no": 1,
+      "edition_size": 1,
+      "list": 3100,
+      "floor": 2900,
+      "shape": "nugget",
+      "secret": "0xb6b6de00c35a158da41b87e8e9bc82ffdc90d262c1632a09ae6850352f22c1",
+      "index": 6,
+      "path": [
+        "0x2515732477851b876702021efbf9d5959dc508dd534fb363919ee0cbb5263f69",
+        "0x1e73826cb2eace9a11f77bbf5d5a7e3fa7b3a2690b08b1b4f165c84de479e124",
+        "0x06f440babef6f373634ebb52762ffad427b34d766c8beccb58bd11bca824b373",
+        "0x04c2ecb0ef1df6770b070e2a75575da9f710b4a636b6382913901140d867b161",
+        "0x06e62084ee7b602fe9abc15632dda3269f56fb0c6e12519a2eb2ec897091919d",
+        "0x03c9e2e67178ac638746f068907e6677b4cc7a9592ef234ab6ab518f17efffa0",
+        "0x15d28cad4c0736decea8997cb324cf0a0e0602f4d74472cd977bce2c8dd9923f",
+        "0x268ed1e1c94c3a45a14db4108bc306613a1c23fab68e0466a002dfb0a3f8d2ab"
+      ],
+      "bits": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  ]
+}

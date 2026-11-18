@@ -1,0 +1,13 @@
+{
+  "id": "northlight",
+  "name": "Northlight Collectibles",
+  "tagline": "Coins, documents and meteorites \u00b7 every listing proven",
+  "about": "A family-run collectibles house specialising in antique coins, historic documents and iron meteorites.",
+  "id_prefix": "NL",
+  "honest": true,
+  "settings_key": "proove.northlight.settings.v1",
+  "store_key": "proove.northlight.sales.v1",
+  "theme": {
+    "accent": "#7cc4ff"
+  }
+}

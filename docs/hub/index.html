@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="oaw-build" content="183292c3d7">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proove Buyer Hub</title>
+  <meta name="description" content="Buy certified unique artifacts from agentic vendors. Every offer carries a zero-knowledge proof of possession that this hub verifies in your browser.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; frame-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+  <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0d11'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%233fcf8e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../shared/oaw-ui.css?v=183292c3d7">
+  <link rel="stylesheet" href="../shared/proove.css?v=183292c3d7">
+  <link rel="stylesheet" href="hub.css?v=183292c3d7">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div>
+        <h1>Proove Buyer Hub</h1>
+        <p class="sub">Unique artifacts from agentic vendors · every offer proven in zero knowledge · you approve every purchase</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="zkStatus" class="oaw-pill" role="status">Verifier not loaded</span>
+      <span id="pill" class="oaw-pill" role="status" aria-live="polite">Loading…</span>
+      <button id="manifestBtn" class="oaw-btn" type="button">Manifest Inspector</button>
+      <button id="settingsBtn" class="oaw-btn" type="button">Model settings</button>
+      <button id="splitBtn" class="oaw-btn primary" type="button" aria-pressed="false">Open Split-View</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="main">
+      <section class="panel" aria-label="Request">
+        <form id="composer" class="composer" autocomplete="off">
+          <label for="request">What artifact are you looking for?</label>
+          <textarea id="request" rows="3" maxlength="600" required placeholder="A certified meteorite fragment, at least 50 g, budget $520"></textarea>
+          <div class="oaw-row"><button id="runBtn" class="oaw-btn primary" type="submit">Find proven offers</button></div>
+          <div id="examples" class="chips" aria-label="Examples"></div>
+        </form>
+      </section>
+
+      <section class="panel" aria-label="Current deal">
+        <h2 class="ph">Deal</h2>
+        <div id="deal" class="deal" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" aria-label="Registry and vendors">
+        <h2 class="ph">Registry and vendors</h2>
+        <ul id="peers" class="peers"></ul>
+        <form id="addVendor" class="oaw-row" autocomplete="off">
+          <label class="sr-only" for="vendorUrl">Vendor site URL</label>
+          <input id="vendorUrl" type="url" placeholder="https://another-vendor.example" spellcheck="false">
+          <button class="oaw-btn" type="submit">Add vendor</button>
+        </form>
+        <p id="vendorMsg" class="oaw-msg" role="alert"></p>
+        <p class="oaw-muted small">discovery_agent reads each site's /agent-manifest.json (or /.well-known/agent-manifest.json) and only asks vendors that publish zk.possession.prover. Proofs are checked against the registry's own verification key, never one a vendor sends.</p>
+      </section>
+
+      <section class="panel" aria-label="Orders">
+        <h2 class="ph">Orders</h2>
+        <ul id="orders" class="orders"></ul>
+      </section>
+    </main>
+
+    <section class="split-pane" aria-label="Registry and vendor sites, live">
+      <div class="split-head"><strong>Live sites</strong> <span id="splitTitle" class="oaw-muted small"></span></div>
+      <p id="splitAttention" class="attention" role="status" hidden></p>
+      <div id="splitFrame" class="split-frame"></div>
+    </section>
+
+    <aside id="stream" class="oaw-stream stream" aria-label="Agent Network Execution Stream"></aside>
+  </div>
+
+  <script type="module" src="app.js?v=183292c3d7"></script>
+</body>
+</html>

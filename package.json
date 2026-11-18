@@ -1,0 +1,24 @@
+{
+  "name": "proove",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Proove: an open agentic marketplace for unique artifacts where every vendor must prove in zero knowledge that it holds a registry-certified item. Static sites, browser agents, Noir + Barretenberg proofs.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node dev-server.js",
+    "build:zk": "node scripts/build-zk.mjs",
+    "setup:registry": "node scripts/setup-registry.mjs",
+    "verify": "node scripts/verify.mjs",
+    "build": "node scripts/build-sites.mjs",
+    "build:pages": "node scripts/build-sites.mjs --base https://isgudtek.github.io/proove/ --out docs",
+    "verify:pages": "node scripts/verify.mjs --base https://isgudtek.github.io/proove/"
+  },
+  "devDependencies": {
+    "@aztec/bb.js": "5.3.0",
+    "@noir-lang/noir_js": "1.0.0",
+    "@noir-lang/noir_wasm": "1.0.0",
+    "esbuild": "0.28.2"
+  }
+}

@@ -1,0 +1,5 @@
+[package]
+name = "hasher"
+type = "bin"
+authors = ["Proove"]
+[dependencies]

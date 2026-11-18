@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proove vendor</title>
+  <meta name="description" content="An open agentic storefront for certified unique artifacts. Every offer carries a zero-knowledge proof of possession.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+  <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0d11'/%3E%3Cpath d='M8 20l8-12 8 12-8 6z' fill='none' stroke='%237cc4ff' stroke-width='2.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../shared/oaw-ui.css">
+  <link rel="stylesheet" href="../shared/proove.css">
+  <link rel="stylesheet" href="vendor.css">
+  <link rel="stylesheet" href="shop-theme.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div>
+        <h1 id="shopName">Vendor</h1>
+        <p id="shopTag" class="sub"></p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="pill" class="oaw-pill" role="status" aria-live="polite">Loading…</span>
+      <button id="manifestBtn" class="oaw-btn" type="button">Manifest Inspector</button>
+      <button id="settingsBtn" class="oaw-btn" type="button">Model settings</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="main">
+      <p id="demoNotice" class="notice" hidden></p>
+      <section class="showcase" aria-label="Current artifact">
+        <div id="viewer" class="viewer3d"><div id="vEmpty" class="v-empty">The artifact a buyer asks for will appear here</div></div>
+        <div class="showcase-info">
+          <p class="kicker" id="curKicker">Showcase</p>
+          <h2 id="curTitle" class="cur-title">No offer yet</h2>
+          <p id="curMeta" class="oaw-muted small"></p>
+          <div id="curProof" class="proof-box"></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Catalog">
+        <h2 class="ph">Certified catalog <span id="zkStatus" class="oaw-muted small">Prover not loaded</span></h2>
+        <ul id="catalog" class="catalog"></ul>
+        <p class="oaw-muted small">Each item's secret code stays in this vendor's vault. "Prove possession" generates a zero-knowledge proof in this browser that anyone can check against the registry's public verification key.</p>
+      </section>
+
+      <section class="panel" aria-label="Offers and sales">
+        <h2 class="ph">Offers and sales</h2>
+        <ul id="offers" class="offers"></ul>
+      </section>
+    </main>
+    <aside id="stream" class="oaw-stream stream" aria-label="Agent Network Execution Stream"></aside>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+[package]
+name = "possession"
+type = "bin"
+authors = ["Proove"]
+[dependencies]

@@ -1,0 +1,171 @@
+{
+  "name": "Atelier Unique",
+  "version": "1.0.0",
+  "description": "A gallery and mineral atelier selling certified specimens, native gold and numbered fine-art editions. Every offer carries a zero-knowledge proof of possession that buyers verify against the Proove Artifact Registry.",
+  "profile": "worldwide-agentic-web-mvp-0.2",
+  "endpoint": "https://isgudtek.github.io/proove/vendor-atelier/",
+  "networks": [
+    {
+      "name": "atelier_vendor",
+      "description": "Match, prove possession, negotiate and sell certified artifacts.",
+      "front_man": "curator_agent",
+      "hocon": "vendor.network.json"
+    }
+  ],
+  "default_network": "atelier_vendor",
+  "capabilities": [
+    "artifact.offer",
+    "zk.possession.prover",
+    "artifact.negotiate",
+    "artifact.sale"
+  ],
+  "registry": {
+    "url": "https://isgudtek.github.io/proove/registry",
+    "requires": "zk.possession.verifier_key"
+  },
+  "agents": [
+    {
+      "name": "curator_agent",
+      "role": "Matches buyer requirements to certified inventory"
+    },
+    {
+      "name": "prover_agent",
+      "role": "Zero-knowledge proof of possession per offer, in the browser (rule-based)"
+    },
+    {
+      "name": "sales_agent",
+      "role": "Counter-offers within the vendor's price floor"
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_catalog",
+      "effect": "read",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Public catalog: titles, categories, stated measures and prices. No item codes."
+    },
+    {
+      "name": "request_offers",
+      "effect": "preview",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Match the buyer's requirements and return offers, each with a possession proof bound to that listing. Non-binding.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "requirements"
+        ],
+        "properties": {
+          "requirements": {
+            "type": "object"
+          },
+          "buyer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "prove_item",
+      "effect": "preview",
+      "requires_approval": false,
+      "rpc_callable": false,
+      "description": "Generate a possession proof for one item (used by prover_agent and the storefront)."
+    },
+    {
+      "name": "negotiate_offer",
+      "effect": "preview",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Non-binding counter-offer on a listing. Max 3 rounds; never below the vendor's floor.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "listing_id",
+          "counter_price"
+        ],
+        "properties": {
+          "listing_id": {
+            "type": "string"
+          },
+          "counter_price": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "name": "confirm_sale",
+      "effect": "write",
+      "requires_approval": true,
+      "rpc_callable": true,
+      "description": "Sell a listing at the agreed price. The vendor owner approves; the item leaves the vault.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "listing_id",
+          "price",
+          "buyer"
+        ],
+        "properties": {
+          "listing_id": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "buyer": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "rpc": {
+    "transport": "window.postMessage",
+    "request": "OAW_RPC_REQUEST",
+    "response": "OAW_RPC_RESPONSE",
+    "event": "OAW_RPC_EVENT",
+    "methods": [
+      "ping",
+      "manifest",
+      "getState",
+      "run",
+      "callTool"
+    ],
+    "trusted_origins": [
+      "https://isgudtek.github.io"
+    ],
+    "consent": "Untrusted origins are asked once. confirm_sale always pauses for the vendor owner's approval."
+  },
+  "window_api": "window.OpenAgenticWeb",
+  "llm": {
+    "providers": [
+      {
+        "id": "otari",
+        "label": "Mozilla Otari Gateway (BYOK)",
+        "base_url": "https://api.otari.ai/api/v1",
+        "eu_base_url": "https://eu.api.otari.ai/api/v1"
+      },
+      {
+        "id": "nano",
+        "label": "Gemini Nano (Chrome Prompt API)"
+      },
+      {
+        "id": "hybrid",
+        "label": "Hybrid Auto"
+      },
+      {
+        "id": "demo",
+        "label": "Demo Mode (deterministic, no key)"
+      }
+    ],
+    "note": "Proofs never depend on a model: prover_agent is deterministic."
+  },
+  "peer_policy": {
+    "mode": "open",
+    "inbound": "postMessage RPC with origin checks",
+    "outbound": "fetches the registry's public data"
+  }
+}

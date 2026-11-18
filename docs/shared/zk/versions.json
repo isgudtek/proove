@@ -1,0 +1,7 @@
+{
+  "noir_js": "1.0.0",
+  "noir_wasm": "1.0.0",
+  "bb_js": "5.3.0",
+  "proving_system": "UltraHonk (Barretenberg)",
+  "srs_size": 131072
+}

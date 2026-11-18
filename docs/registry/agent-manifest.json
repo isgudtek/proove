@@ -1,0 +1,127 @@
+{
+  "name": "Proove Artifact Registry",
+  "version": "1.0.0",
+  "description": "An independent certification house for unique artifacts (meteorites, rare minerals, precious metals, antique coins, limited-edition art, historic documents). It publishes only a commitment root and a verification key: vendors prove in zero knowledge that they hold a certified item, and buyers verify those proofs in their own browser.",
+  "profile": "worldwide-agentic-web-mvp-0.2",
+  "endpoint": "https://isgudtek.github.io/proove/registry/",
+  "networks": [
+    {
+      "name": "proove_registry",
+      "description": "Registry root, verification key, custody checks and custody transfers.",
+      "front_man": "registry_clerk",
+      "hocon": "registry.network.json"
+    }
+  ],
+  "default_network": "proove_registry",
+  "capabilities": [
+    "artifact.registry",
+    "zk.possession.verifier_key",
+    "custody.check",
+    "custody.transfer"
+  ],
+  "zk": {
+    "statement": "The prover knows the secret code of an item in this registry's commitment tree whose category, edition size, measure and certification year satisfy the listing, and binds the proof to one listing. The proof reveals neither the item nor the code. The returned nullifier is the same for every proof about the same item.",
+    "proving_system": "UltraHonk (Barretenberg), Noir circuit",
+    "registry_data": "registry-data.json",
+    "custody": "custody.json",
+    "public_inputs": [
+      "root",
+      "category",
+      "edition_size",
+      "min_measure",
+      "min_year",
+      "listing",
+      "nullifier"
+    ],
+    "listing_binding": "first 31 bytes of SHA-256(\"proove|<vendor_id>|<listing_id>\")"
+  },
+  "agents": [
+    {
+      "name": "registry_clerk",
+      "role": "Registry root, verification key, custody checks and transfers (rule-based)"
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_registry",
+      "effect": "read",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Current commitment root, item count, circuit fingerprint and verification key."
+    },
+    {
+      "name": "check_custody",
+      "effect": "read",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Registered holder and status of a nullifier.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "nullifier"
+        ],
+        "properties": {
+          "nullifier": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "record_transfer",
+      "effect": "write",
+      "requires_approval": true,
+      "rpc_callable": true,
+      "description": "Record that a certified item was sold: the nullifier moves from the vendor to the buyer and can no longer be listed.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "nullifier",
+          "from",
+          "to",
+          "order_id"
+        ],
+        "properties": {
+          "nullifier": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "rpc": {
+    "transport": "window.postMessage",
+    "request": "OAW_RPC_REQUEST",
+    "response": "OAW_RPC_RESPONSE",
+    "event": "OAW_RPC_EVENT",
+    "methods": [
+      "ping",
+      "manifest",
+      "getState",
+      "run",
+      "callTool"
+    ],
+    "trusted_origins": [
+      "https://isgudtek.github.io"
+    ],
+    "consent": "Untrusted origins are asked once. record_transfer always pauses for the registry owner's approval."
+  },
+  "window_api": "window.OpenAgenticWeb",
+  "llm": {
+    "note": "The registry clerk is deterministic; no model is needed. Model settings exist for consistency with the other sites."
+  },
+  "peer_policy": {
+    "mode": "open",
+    "inbound": "postMessage RPC with origin checks",
+    "outbound": "none"
+  }
+}

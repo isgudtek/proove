@@ -1,0 +1,13 @@
+{
+  "id": "atelier",
+  "name": "Atelier Unique",
+  "tagline": "Minerals, precious metals and limited-edition art",
+  "about": "A gallery and mineral atelier selling certified specimens, native gold and numbered fine-art editions.",
+  "id_prefix": "AU",
+  "honest": true,
+  "settings_key": "proove.atelier.settings.v1",
+  "store_key": "proove.atelier.sales.v1",
+  "theme": {
+    "accent": "#ffb37c"
+  }
+}

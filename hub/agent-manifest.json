@@ -1,0 +1,57 @@
+{
+  "name": "Proove Buyer Hub",
+  "version": "1.0.0",
+  "description": "Buy certified unique artifacts (meteorites, rare minerals, precious metals, antique coins, limited-edition art, historic documents) from independent agentic vendors. Every offer must carry a zero-knowledge proof that the vendor holds a registry-certified item; the hub verifies each proof in your browser, rejects copies and counterfeits, and asks you before anything is bought.",
+  "profile": "worldwide-agentic-web-mvp-0.2",
+  "endpoint": "http://localhost:62274/",
+  "networks": [
+    {
+      "name": "proove_hub",
+      "description": "Request -> requirements -> vendor discovery -> proven offers -> verification -> choice -> negotiation -> approved order and registry transfer.",
+      "front_man": "intake_agent",
+      "hocon": "hub.network.json"
+    }
+  ],
+  "default_network": "proove_hub",
+  "capabilities": ["artifact.procurement", "zk.possession.verifier", "artifact.comparison", "artifact.negotiation", "artifact.order"],
+  "peers": {
+    "registry": "http://localhost:62270",
+    "vendors": ["http://localhost:62271", "http://localhost:62272", "http://localhost:62273"],
+    "required_capability": "zk.possession.prover"
+  },
+  "agents": [
+    { "name": "intake_agent", "role": "Request -> requirements (categories, minimum grams, certification year, edition size, budget)" },
+    { "name": "discovery_agent", "role": "Reads registry and vendor manifests, shortlists vendors that prove possession" },
+    { "name": "verifier_agent", "role": "Verifies every zero-knowledge proof, root, listing binding, claims and custody (rule-based)" },
+    { "name": "negotiator_agent", "role": "Negotiates with the chosen vendor within budget, triggers human approval" }
+  ],
+  "tools": [
+    { "name": "discover", "effect": "read", "requires_approval": false, "rpc_callable": false, "description": "Fetch the registry's data and the vendors' manifests (asks before contacting a new origin)." },
+    { "name": "request_offers", "effect": "read", "requires_approval": false, "rpc_callable": false, "description": "Ask a vendor for offers matching the requirements, each with a possession proof. Non-binding." },
+    { "name": "verify_offer", "effect": "read", "requires_approval": false, "rpc_callable": false, "description": "Verify an offer's zero-knowledge proof with the registry's verification key, in this browser." },
+    { "name": "check_custody", "effect": "read", "requires_approval": false, "rpc_callable": false, "description": "Ask the registry who holds a nullifier." },
+    { "name": "send_counter_offer", "effect": "read", "requires_approval": false, "rpc_callable": false, "description": "Counter-offer to the chosen vendor. Non-binding." },
+    { "name": "place_order", "effect": "write", "requires_approval": true, "rpc_callable": false, "description": "Buy the chosen, verified artifact: the vendor confirms the sale and the registry records the transfer. Never above the budget." },
+    { "name": "list_orders", "effect": "read", "requires_approval": false, "rpc_callable": true, "description": "Orders placed from this hub." }
+  ],
+  "rpc": {
+    "transport": "window.postMessage",
+    "request": "OAW_RPC_REQUEST",
+    "response": "OAW_RPC_RESPONSE",
+    "event": "OAW_RPC_EVENT",
+    "methods": ["ping", "manifest", "getState", "run", "callTool"],
+    "trusted_origins": [],
+    "consent": "Every other origin is asked once. place_order always pauses for approval on this site."
+  },
+  "window_api": "window.OpenAgenticWeb",
+  "llm": {
+    "providers": [
+      { "id": "otari", "label": "Mozilla Otari Gateway (BYOK)", "base_url": "https://api.otari.ai/api/v1", "eu_base_url": "https://eu.api.otari.ai/api/v1" },
+      { "id": "nano", "label": "Gemini Nano (Chrome Prompt API)" },
+      { "id": "hybrid", "label": "Hybrid Auto" },
+      { "id": "demo", "label": "Demo Mode (deterministic, no key)" }
+    ],
+    "note": "Verification never depends on a model: verifier_agent is deterministic."
+  },
+  "peer_policy": { "mode": "open", "outbound": "consent per origin before the first contact", "inbound": "postMessage RPC with origin checks and consent" }
+}

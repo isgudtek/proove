@@ -1,0 +1,13 @@
+{
+  "id": "shady",
+  "name": "Shady Rocks",
+  "tagline": "Unbeatable prices on rare finds",
+  "about": "A deliberately dishonest demo vendor: it lists a copied item code and a counterfeit, to show what the buyer's verification catches.",
+  "id_prefix": "SR",
+  "honest": false,
+  "settings_key": "proove.shady.settings.v1",
+  "store_key": "proove.shady.sales.v1",
+  "theme": {
+    "accent": "#d7ff7c"
+  }
+}

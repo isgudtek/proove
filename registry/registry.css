@@ -1,0 +1,4 @@
+:root { --accent: #c8a6ff; }
+#custody tr.flash td { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: #c8a6ff33; } to { background: transparent; } }
+body.embedded .main > .panel:first-child p.oaw-muted { display: none; }

@@ -1,0 +1,128 @@
+{
+  "metadata": {
+    "name": "atelier_vendor",
+    "description": "Atelier Unique: matches buyer requests to certified items, proves possession of each offered item in zero knowledge, and negotiates within the vendor's price floor."
+  },
+  "tools": [
+    {
+      "name": "curator_agent",
+      "function": {
+        "description": "Front agent. Matches a buyer's requirements to the vendor's certified inventory and writes a one-line pitch per match.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "requirements"
+          ],
+          "properties": {
+            "requirements": {
+              "type": "object"
+            },
+            "catalog": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "instructions": "You receive buyer requirements (categories, minimum measure in grams, minimum certification year, maximum edition size) and the vendor's catalog (no secrets). Return only catalog items that satisfy every requirement. Do not invent items. For each, write a short factual pitch (max 25 words). Reply with {\"matches\": [{\"item_id\": <id from the catalog>, \"pitch\": <string>}]} and nothing else.",
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "matches"
+        ],
+        "properties": {
+          "matches": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "required": [
+                "item_id",
+                "pitch"
+              ],
+              "properties": {
+                "item_id": {
+                  "type": "string"
+                },
+                "pitch": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        }
+      },
+      "tools": [
+        "prover_agent",
+        "sales_agent"
+      ]
+    },
+    {
+      "name": "prover_agent",
+      "rule_based": true,
+      "function": {
+        "description": "Generates, in this browser, a zero-knowledge proof that the vendor holds the secret code of a registry-certified item satisfying the buyer's thresholds, bound to one listing. Deterministic; no model involved."
+      },
+      "instructions": "For every matched item, prove possession with the registry's current root and the buyer's thresholds. Never send item codes anywhere.",
+      "tools": [
+        "prove_item"
+      ]
+    },
+    {
+      "name": "sales_agent",
+      "function": {
+        "description": "Negotiates the price of one listing. The vendor's code enforces the price floor.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "counter_price",
+            "floor_price",
+            "current"
+          ],
+          "properties": {
+            "counter_price": {
+              "type": "number"
+            },
+            "floor_price": {
+              "type": "number"
+            },
+            "current": {
+              "type": "number"
+            },
+            "round": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "instructions": "The buyer made a counter-offer. Accept any counter at or above floor_price. Never go below floor_price. Otherwise counter with a price between floor_price and current, moving towards the buyer each round. Reply with {\"decision\": \"accept\" | \"counter\", \"price\": <number>, \"message\": <short polite sentence>} and nothing else.",
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "decision",
+          "price",
+          "message"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "counter"
+            ]
+          },
+          "price": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      },
+      "tools": [
+        "confirm_sale"
+      ]
+    }
+  ]
+}

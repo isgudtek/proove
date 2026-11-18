@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="oaw-build" content="183292c3d7">
+  <title>Proove: unique artifacts, proven in zero knowledge</title>
+  <meta name="description" content="An open agentic marketplace where every vendor must prove in zero knowledge that it holds a registry-certified unique artifact. Buyers verify each proof in the browser.">
+  <style>
+    body { margin: 0; font: 16px/1.5 ui-sans-serif, system-ui, sans-serif; background: #0d1014; color: #e8ecf1; display: grid; place-items: center; min-height: 100vh; }
+    main { max-width: 860px; padding: 32px; }
+    h1 { font-size: 30px; margin: 0 0 8px; }
+    p { color: #a9b4c2; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 22px; }
+    a.card { display: block; padding: 16px; border-radius: 14px; text-decoration: none; color: inherit; border: 1px solid #263040; background: #151a21; }
+    a.card:hover { border-color: #3fcf8e; }
+    a.card.hub { border-color: #3fcf8e88; grid-column: 1 / -1; }
+    a.card.bad { border-color: #f2b84b55; }
+    strong { display: block; font-size: 17px; margin-bottom: 4px; }
+    code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; }
+    .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .links a { color: #e8ecf1; text-decoration: none; padding: 8px 14px; border-radius: 999px; border: 1px solid #263040; background: #151a21; font-size: 14px; }
+    .links a.video { background: #3fcf8e; border-color: #3fcf8e; color: #0d1014; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Proove</h1>
+    <p>An open agentic marketplace for unique artifacts: meteorite fragments, rare minerals, precious metals, antique coins, limited-edition art and historic documents. A vendor cannot just say it has an item. Each offer carries a zero-knowledge proof (Noir circuit, UltraHonk) that the vendor knows the secret code of an item certified by the registry, bound to that one listing. The buyer's hub verifies every proof in the browser with the registry's own verification key and checks custody at the registry before anything is bought.</p>
+    <div class="cards">
+      <a class="card hub" href="hub/"><strong>Proove Buyer Hub</strong>Start here. Ask for an artifact; agents discover the vendors, collect proven offers, verify them, negotiate within your budget and ask for your approval.</a>
+      <a class="card" href="registry/"><strong>Proove Artifact Registry</strong>Publishes the commitment root and verification key, answers custody checks and records transfers.</a>
+      <a class="card" href="vendor-northlight/"><strong>Northlight Collectibles</strong>Honest vendor: coins, documents and meteorites.</a>
+      <a class="card" href="vendor-atelier/"><strong>Atelier Unique</strong>Honest vendor: minerals, art editions, a pallasite and a gold nugget.</a>
+      <a class="card bad" href="vendor-shady/"><strong>Shady Rocks</strong>Deliberately dishonest demo vendor: a copied item code and a counterfeit with a forged proof.</a>
+    </div>
+    <nav class="links" aria-label="Project links">
+      <a href="https://github.com/isgudtek/proove" target="_blank" rel="noopener">Source code on GitHub</a>
+    </nav>
+    <p>Every site publishes <code>agent-manifest.json</code> and runs its own agents in your browser. Demo Mode needs no key; bring a Mozilla Otari key or use Chrome's Gemini Nano for model-driven agents. Proof verification never depends on a model.</p>
+  </main>
+</body>
+</html>
