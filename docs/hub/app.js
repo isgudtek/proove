@@ -4,12 +4,12 @@
  * -> verifier_agent (zero-knowledge proof + registry checks, deterministic) -> buyer choice -> negotiator_agent
  * -> place_order (your approval) -> vendor confirm_sale (vendor's approval) -> registry record_transfer (registry's approval).
  */
-import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=c8a3d2e978";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=c8a3d2e978";
-import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=c8a3d2e978";
-import { findImage, preload } from "../shared/image-search.js?v=c8a3d2e978";
-import { createFlow } from "./flow.js?v=c8a3d2e978";
-import * as H from "./hub-logic.js?v=c8a3d2e978";
+import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=364e880711";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=364e880711";
+import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=364e880711";
+import { findImage, preload } from "../shared/image-search.js?v=364e880711";
+import { createFlow } from "./flow.js?v=364e880711";
+import * as H from "./hub-logic.js?v=364e880711";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
@@ -53,7 +53,7 @@ const consent = createConsent();
 /* --------------------------------------------------------- zero knowledge */
 
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=c8a3d2e978"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=364e880711"));
 let zkReady = null;
 function warmZk() {
   zkReady ??= (async () => {
@@ -162,8 +162,8 @@ async function peer(url) {
   return c;
 }
 
-/* Simulation: every site in the split view runs its agents with the hub's model settings (mode, model and key). */
-const hubSettings = () => { const s = runtime.settings; return { mode: s.mode, otari: { ...s.otari } }; };
+/* Vendor and registry sites run in Demo Mode: no model, no key. Keys never leave the hub. */
+const hubSettings = () => ({ mode: "demo", otari: { baseUrl: "", apiKey: "", model: "" } });
 async function lendSettings(key, c = clients.get(key)) {
   if (!c?.ready) return;
   try {

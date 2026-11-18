@@ -83,7 +83,7 @@ npm run build:pages      # docs/ for GitHub Pages (URLs rewritten, .well-known a
 npm run verify:pages     # the same checks against the live site
 ```
 
-No model key is needed: Demo Mode answers deterministically. In the hub's **Model settings** you can bring a Mozilla Otari key or use Chrome's on-device Gemini Nano for the model-driven agents. **The four sites in the split view inherit the hub's settings** (mode, Otari region, model and key) over the `useSettings` RPC method, so one key drives every agent in the simulation. They keep the lent settings in memory only; saving or deleting settings on one of those sites switches it back to its own. In a real marketplace you would not lend your key to vendors. Proof generation and verification never involve a model.
+No model key is needed. The hub's **Model settings** lets you bring a Mozilla Otari key or use Chrome's on-device Gemini Nano for the hub's own agents. The registry and vendor sites run in Demo Mode (deterministic, no model, no key) through the `useSettings` RPC method, so your key never leaves the hub. In a real marketplace, each vendor would run its own model with its own key. Proof generation and verification never involve a model.
 
 ## Layout
 

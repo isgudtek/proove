@@ -284,7 +284,7 @@ serveRpc({
       lender.lend(settings, from);
       const d = runtime.describeProvider();
       runtime.emit({ type: "provider", provider: d });
-      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}${settings.otari?.apiKey ? " (key lent, not saved here)" : ""}` : "Back to this site's own model settings." });
+      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}` : "Back to this site's own model settings." });
       return { applied: true, provider: d.label, mode: d.mode };
     },
     run: ({ requirements }, ctx) => runtime.callTool("request_offers", { requirements: requirements || {} }, ctx),

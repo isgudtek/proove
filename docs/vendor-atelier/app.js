@@ -2,11 +2,11 @@
  * Proove vendor storefront (one codebase; vendor-<id>/ supplies shop.json, manifest, network, vault and theme).
  * curator_agent -> prover_agent (zero-knowledge, in this browser) -> sales_agent.
  */
-import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, fetchJson, OawError, uid } from "../shared/oaw-core.js?v=c8a3d2e978";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=c8a3d2e978";
-import { CATEGORIES, listingField } from "../shared/merkle.js?v=c8a3d2e978";
-import { safeImage } from "../shared/image-search.js?v=c8a3d2e978";
-import * as V from "./vendor-logic.js?v=c8a3d2e978";
+import { AgentRuntime, lendableStorage, serveRpc, exposeGlobal, fetchJson, OawError, uid } from "../shared/oaw-core.js?v=364e880711";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=364e880711";
+import { CATEGORIES, listingField } from "../shared/merkle.js?v=364e880711";
+import { safeImage } from "../shared/image-search.js?v=364e880711";
+import * as V from "./vendor-logic.js?v=364e880711";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 let embedded = window.parent !== window || new URLSearchParams(location.search).has("embedded");
@@ -37,7 +37,7 @@ async function loadRegistry(emit) {
   return registry;
 }
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=c8a3d2e978"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=364e880711"));
 async function warmZk() {
   const z = await zk();
   $("#zkStatus").textContent = "Loading prover…";
@@ -75,7 +75,7 @@ function drawPhoto(item) {
 }
 async function ensurePhoto(item) {
   if (photos.has(item.id)) return;
-  const { findImage } = await import("../shared/image-search.js?v=c8a3d2e978");
+  const { findImage } = await import("../shared/image-search.js?v=364e880711");
   const p = await findImage(item).catch(() => null);
   if (p && !photos.has(item.id)) photos.set(item.id, { ...p, by: "this shop's rule-based search" });
   if (!p && current?.id === item.id) $("#vEmpty").textContent = "No openly licensed reference photo found";
@@ -284,7 +284,7 @@ serveRpc({
       lender.lend(settings, from);
       const d = runtime.describeProvider();
       runtime.emit({ type: "provider", provider: d });
-      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}${settings.otari?.apiKey ? " (key lent, not saved here)" : ""}` : "Back to this site's own model settings." });
+      runtime.emit({ type: "note", text: settings ? `Using ${lender.from}'s model settings for this session: ${d.label}` : "Back to this site's own model settings." });
       return { applied: true, provider: d.label, mode: d.mode };
     },
     run: ({ requirements }, ctx) => runtime.callTool("request_offers", { requirements: requirements || {} }, ctx),

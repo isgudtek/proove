@@ -155,13 +155,14 @@ export function clearSettings(key, storage = globalThis.localStorage) { storage?
 
 /**
  * Storage for AgentRuntime that can use another site's model settings for this page session only (memory, never saved).
- * The buyer hub lends its settings to the sites it opens. Saving or deleting settings on this site ends the loan.
+ * The buyer hub lends a model mode to the sites it opens, never a credential. Saving or deleting settings here ends the loan.
  */
 export function lendableStorage(key, base = globalThis.localStorage) {
   let lent = null; // { settings, from }
   const clean = (s) => ({
     mode: MODES.includes(s?.mode) ? s.mode : null,
-    otari: { baseUrl: String(s?.otari?.baseUrl || OTARI_REGIONS.global).slice(0, 200), apiKey: String(s?.otari?.apiKey || "").slice(0, 400), model: String(s?.otari?.model || OTARI_MODELS[0]).slice(0, 120) },
+    // A lent setting never carries a credential: the spec keeps user keys away from peer sites.
+    otari: { baseUrl: String(s?.otari?.baseUrl || OTARI_REGIONS.global).slice(0, 200), apiKey: "", model: String(s?.otari?.model || OTARI_MODELS[0]).slice(0, 120) },
   });
   return {
     storage: {

@@ -162,8 +162,8 @@ async function peer(url) {
   return c;
 }
 
-/* Simulation: every site in the split view runs its agents with the hub's model settings (mode, model and key). */
-const hubSettings = () => { const s = runtime.settings; return { mode: s.mode, otari: { ...s.otari } }; };
+/* Vendor and registry sites run in Demo Mode: no model, no key. Keys never leave the hub. */
+const hubSettings = () => ({ mode: "demo", otari: { baseUrl: "", apiKey: "", model: "" } });
 async function lendSettings(key, c = clients.get(key)) {
   if (!c?.ready) return;
   try {
