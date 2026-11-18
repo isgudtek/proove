@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="oaw-build" content="b90dd1ce93">
+  <meta name="oaw-build" content="ca5ca22601">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proove Buyer Hub</title>
   <meta name="description" content="Buy certified unique artifacts from agentic vendors. Every offer carries a zero-knowledge proof of possession that this hub verifies in your browser.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob: https://upload.wikimedia.org https://thumb.wikimedia.org; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; frame-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
   <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0d11'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%233fcf8e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="../shared/oaw-ui.css?v=b90dd1ce93">
-  <link rel="stylesheet" href="../shared/proove.css?v=b90dd1ce93">
-  <link rel="stylesheet" href="hub.css?v=b90dd1ce93">
+  <link rel="stylesheet" href="../shared/oaw-ui.css?v=ca5ca22601">
+  <link rel="stylesheet" href="../shared/proove.css?v=ca5ca22601">
+  <link rel="stylesheet" href="hub.css?v=ca5ca22601">
 </head>
 <body>
   <header class="topbar">
@@ -71,7 +71,7 @@
     </main>
 
     <section class="split-pane" aria-label="Registry and vendor sites, live">
-      <div class="split-head"><strong>Live sites</strong> <span id="splitTitle" class="oaw-muted small"></span></div>
+      <div class="split-head"><span><strong>Live sites</strong> <span id="splitTitle" class="oaw-muted small"></span></span><button id="splitPop" class="oaw-btn small" type="button">Pop out</button></div>
       <p id="splitAttention" class="attention" role="status" hidden></p>
       <div id="splitFrame" class="split-frame"></div>
     </section>
@@ -80,6 +80,6 @@
   </div>
 
   <div id="popBackdrop" class="pop-backdrop" hidden></div>
-  <script type="module" src="app.js?v=b90dd1ce93"></script>
+  <script type="module" src="app.js?v=ca5ca22601"></script>
 </body>
 </html>

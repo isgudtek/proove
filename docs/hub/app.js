@@ -4,12 +4,12 @@
  * -> verifier_agent (zero-knowledge proof + registry checks, deterministic) -> buyer choice -> negotiator_agent
  * -> place_order (your approval) -> vendor confirm_sale (vendor's approval) -> registry record_transfer (registry's approval).
  */
-import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=b90dd1ce93";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=b90dd1ce93";
-import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=b90dd1ce93";
-import { findImage, preload } from "../shared/image-search.js?v=b90dd1ce93";
-import { createFlow } from "./flow.js?v=b90dd1ce93";
-import * as H from "./hub-logic.js?v=b90dd1ce93";
+import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=ca5ca22601";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=ca5ca22601";
+import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=ca5ca22601";
+import { findImage, preload } from "../shared/image-search.js?v=ca5ca22601";
+import { createFlow } from "./flow.js?v=ca5ca22601";
+import * as H from "./hub-logic.js?v=ca5ca22601";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
@@ -53,7 +53,7 @@ const consent = createConsent();
 /* --------------------------------------------------------- zero knowledge */
 
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=b90dd1ce93"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=ca5ca22601"));
 let zkReady = null;
 function warmZk() {
   zkReady ??= (async () => {
@@ -84,7 +84,7 @@ function frameFor(url) {
     const wrap = h("div", { class: "peer" });
     wrap.append(h("div", { class: "peer-label" },
       h("strong", { text: shortName(key) }), h("span", { class: "oaw-muted small grow", text: ` ${host(key)}${new URL(key).pathname}` }),
-      h("button", { class: "oaw-btn small pop-btn", type: "button", text: "Pop out", "aria-label": `Pop out ${shortName(key)}`, onclick: () => togglePop(wrap, key) }),
+      h("button", { class: "oaw-btn small pop-btn", type: "button", text: "Pop out", "aria-label": `Pop out ${shortName(key)}`, onclick: (e) => togglePop(wrap, key, e.currentTarget) }),
       h("a", { class: "oaw-btn small ghost", href: `${key}/`, target: "_blank", rel: "noopener", text: "New tab", title: "Opens a separate copy of the site (not connected to this deal)" })), el);
     f = { el, wrap };
     frames.set(key, f);
@@ -103,7 +103,7 @@ function openSplit(urls) {
   $("#splitBtn").textContent = "Close Split-View";
 }
 function closeSplit() {
-  if (popped?.key) togglePop(popped.target);
+  if (popped && popped.target !== $("#flowPanel")) togglePop(popped.target);
   document.body.classList.remove("split-on");
   for (const [key, f] of frames) { f.wrap.remove(); const c = clients.get(key); if (c) c.ready = false; }
   frames.clear();
@@ -115,25 +115,27 @@ $("#splitBtn").addEventListener("click", () => (document.body.classList.contains
    page, agents and RPC connection stay alive; the page is only asked to switch to its normal, non-compact layout. */
 let popped = null;
 function viewMode(key, embedded) { const f = key && frames.get(key); try { f?.el.contentWindow?.postMessage({ type: "OAW_VIEW", embedded }, originOf(key)); } catch { /* frame gone */ } }
-function togglePop(target, key = null) {
+function togglePop(target, key = null, btn = null) {
   const was = popped;
   if (was) {
     was.target.classList.remove("popped");
-    was.target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Pop out");
+    was.btn?.replaceChildren("Pop out");
     viewMode(was.key, true);
     popped = null;
   }
   if (was?.target !== target) {
     target.classList.add("popped");
-    target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Close ✕");
+    btn?.replaceChildren("Close ✕");
     viewMode(key, false);
-    popped = { target, key };
+    popped = { target, key, btn };
   }
   $("#popBackdrop").hidden = !popped;
 }
 $("#popBackdrop").addEventListener("click", () => popped && togglePop(popped.target));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && popped) togglePop(popped.target); });
-$("#flowPop").addEventListener("click", () => togglePop($("#flowPanel")));
+$("#flowPop").addEventListener("click", (e) => togglePop($("#flowPanel"), null, e.currentTarget));
+// The whole live-sites grid: the four sites stay compact, just much larger.
+$("#splitPop").addEventListener("click", (e) => togglePop($(".split-pane"), null, e.currentTarget));
 
 const peerWindow = (url) => frames.get(trimUrl(url))?.el.contentWindow || null;
 

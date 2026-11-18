@@ -33,7 +33,7 @@ h1 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
 .oaw-modal input, .oaw-modal select { background: #0f141a; color: var(--oaw-ink); }
 
 .layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 14px; padding: 14px 18px 18px; }
-.main { min-width: 0; overflow: auto; display: grid; gap: 14px; align-content: start; }
+.main { position: relative; min-width: 0; overflow: auto; display: grid; gap: 14px; align-content: start; } /* relative: keeps absolutely positioned children (sr-only labels) inside the scroller */
 .stream { min-height: 0; }
 .panel { background: var(--oaw-panel); border: 1px solid var(--oaw-line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 10px; }
 .ph { margin: 0; font-size: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
@@ -61,9 +61,14 @@ table.ledger th { color: var(--oaw-muted); font-weight: 600; font-size: 11.5px; 
 .st-held { color: var(--ok); }
 .st-transferred { color: var(--warn); }
 
-body.embedded .topbar { padding: 6px 10px; flex-wrap: nowrap; }
-body.embedded .sub, body.embedded #manifestBtn { display: none; }
-body.embedded h1 { font-size: 14.5px; white-space: nowrap; }
+body.embedded .topbar { padding: 6px 10px; flex-wrap: nowrap; min-width: 0; }
+body.embedded .sub, body.embedded #manifestBtn, body.embedded #settingsBtn { display: none; } /* Pop out shows them */
+body.embedded .brand { min-width: 0; flex: 1; }
+body.embedded .brand > div { min-width: 0; }
+body.embedded h1 { font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.embedded .actions { flex: none; min-width: 0; }
+body.embedded .oaw-pill { max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.embedded, body.embedded .layout, body.embedded .main { min-width: 0; max-width: 100vw; overflow-x: hidden; }
 body.embedded .mark { width: 24px; height: 24px; }
 body.embedded .actions .oaw-btn, body.embedded .oaw-pill { padding: 3px 9px; font-size: 12px; }
 body.embedded .layout { grid-template-columns: 1fr; padding: 8px; gap: 8px; }
@@ -71,3 +76,4 @@ body.embedded .stream { display: none; }
 body.embedded { height: auto; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } .stream { min-height: 360px; } body { height: auto; } }
 .v-empty[hidden] { display: none; }
+dd.mono { word-break: break-all; }

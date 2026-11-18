@@ -84,7 +84,7 @@ function frameFor(url) {
     const wrap = h("div", { class: "peer" });
     wrap.append(h("div", { class: "peer-label" },
       h("strong", { text: shortName(key) }), h("span", { class: "oaw-muted small grow", text: ` ${host(key)}${new URL(key).pathname}` }),
-      h("button", { class: "oaw-btn small pop-btn", type: "button", text: "Pop out", "aria-label": `Pop out ${shortName(key)}`, onclick: () => togglePop(wrap, key) }),
+      h("button", { class: "oaw-btn small pop-btn", type: "button", text: "Pop out", "aria-label": `Pop out ${shortName(key)}`, onclick: (e) => togglePop(wrap, key, e.currentTarget) }),
       h("a", { class: "oaw-btn small ghost", href: `${key}/`, target: "_blank", rel: "noopener", text: "New tab", title: "Opens a separate copy of the site (not connected to this deal)" })), el);
     f = { el, wrap };
     frames.set(key, f);
@@ -103,7 +103,7 @@ function openSplit(urls) {
   $("#splitBtn").textContent = "Close Split-View";
 }
 function closeSplit() {
-  if (popped?.key) togglePop(popped.target);
+  if (popped && popped.target !== $("#flowPanel")) togglePop(popped.target);
   document.body.classList.remove("split-on");
   for (const [key, f] of frames) { f.wrap.remove(); const c = clients.get(key); if (c) c.ready = false; }
   frames.clear();
@@ -115,25 +115,27 @@ $("#splitBtn").addEventListener("click", () => (document.body.classList.contains
    page, agents and RPC connection stay alive; the page is only asked to switch to its normal, non-compact layout. */
 let popped = null;
 function viewMode(key, embedded) { const f = key && frames.get(key); try { f?.el.contentWindow?.postMessage({ type: "OAW_VIEW", embedded }, originOf(key)); } catch { /* frame gone */ } }
-function togglePop(target, key = null) {
+function togglePop(target, key = null, btn = null) {
   const was = popped;
   if (was) {
     was.target.classList.remove("popped");
-    was.target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Pop out");
+    was.btn?.replaceChildren("Pop out");
     viewMode(was.key, true);
     popped = null;
   }
   if (was?.target !== target) {
     target.classList.add("popped");
-    target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Close ✕");
+    btn?.replaceChildren("Close ✕");
     viewMode(key, false);
-    popped = { target, key };
+    popped = { target, key, btn };
   }
   $("#popBackdrop").hidden = !popped;
 }
 $("#popBackdrop").addEventListener("click", () => popped && togglePop(popped.target));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && popped) togglePop(popped.target); });
-$("#flowPop").addEventListener("click", () => togglePop($("#flowPanel")));
+$("#flowPop").addEventListener("click", (e) => togglePop($("#flowPanel"), null, e.currentTarget));
+// The whole live-sites grid: the four sites stay compact, just much larger.
+$("#splitPop").addEventListener("click", (e) => togglePop($(".split-pane"), null, e.currentTarget));
 
 const peerWindow = (url) => frames.get(trimUrl(url))?.el.contentWindow || null;
 
