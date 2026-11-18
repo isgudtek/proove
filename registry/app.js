@@ -8,6 +8,8 @@ import { h, $, createStream, createApproval, createConsent, createSettings, crea
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const embedded = window.parent !== window || new URLSearchParams(location.search).has("embedded");
 document.body.classList.toggle("embedded", embedded);
+// The hub's "Pop out" shows this page full size: it asks for the normal (non-compact) layout. Only the parent may ask.
+window.addEventListener("message", (e) => { if (e.source === window.parent && e.data?.type === "OAW_VIEW") document.body.classList.toggle("embedded", !!e.data.embedded); });
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
 const [manifest, network, data, seed] = await Promise.all([get("agent-manifest.json"), get("registry.network.json"), get("registry-data.json"), get("custody.json")]);
 

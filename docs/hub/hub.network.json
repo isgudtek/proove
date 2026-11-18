@@ -2,43 +2,129 @@
   "metadata": {
     "name": "proove_hub",
     "description": "Proove Buyer Hub: turns a request for a unique artifact into requirements, discovers vendors through their manifests, collects offers that each carry a zero-knowledge proof of possession, verifies every proof against the registry, lets the buyer choose, negotiates and orders. Every write pauses for human approval.",
-    "limits": { "max_negotiation_rounds": 3 }
+    "limits": {
+      "max_negotiation_rounds": 3
+    }
   },
   "tools": [
     {
       "name": "intake_agent",
       "function": {
         "description": "Front agent. Extracts structured requirements from the buyer's request.",
-        "parameters": { "type": "object", "required": ["request"], "properties": { "request": { "type": "string" } } }
+        "parameters": {
+          "type": "object",
+          "required": [
+            "request"
+          ],
+          "properties": {
+            "request": {
+              "type": "string"
+            }
+          }
+        }
       },
       "instructions": "Extract requirements for a certified unique artifact. categories is a list drawn from: meteorite, mineral, precious_metal, coin, artwork, document (only those the buyer wants). min_measure is the minimum mass in grams, or null. min_year is the earliest acceptable certification year, or null. max_edition_size is 1 for one-of-a-kind, a number for limited editions, or null. max_budget is a number in USD, or null. summary is one short sentence. Reply with the JSON object only.",
       "output_schema": {
         "type": "object",
-        "required": ["categories", "max_budget"],
+        "required": [
+          "categories",
+          "max_budget"
+        ],
         "properties": {
-          "categories": { "type": "array", "maxItems": 6, "items": { "type": "string", "enum": ["meteorite", "mineral", "precious_metal", "coin", "artwork", "document"] } },
-          "min_measure": { "type": ["number", "null"] },
-          "min_year": { "type": ["number", "null"] },
-          "max_edition_size": { "type": ["number", "null"] },
-          "max_budget": { "type": ["number", "null"] },
-          "summary": { "type": "string", "maxLength": 160 }
+          "categories": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "string",
+              "enum": [
+                "meteorite",
+                "mineral",
+                "precious_metal",
+                "coin",
+                "artwork",
+                "document"
+              ]
+            }
+          },
+          "min_measure": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_year": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "max_edition_size": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "max_budget": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 160
+          }
         }
       },
-      "tools": ["discovery_agent"]
+      "tools": [
+        "discovery_agent"
+      ]
     },
     {
       "name": "discovery_agent",
       "function": {
         "description": "Reads the registry's and vendors' public agent manifests and shortlists vendors that can prove possession.",
-        "parameters": { "type": "object", "required": ["vendors"], "properties": { "vendors": { "type": "array" }, "requirements": { "type": "object" } } }
+        "parameters": {
+          "type": "object",
+          "required": [
+            "vendors"
+          ],
+          "properties": {
+            "vendors": {
+              "type": "array"
+            },
+            "requirements": {
+              "type": "object"
+            }
+          }
+        }
       },
       "instructions": "Shortlist every vendor from the list that publishes the capability zk.possession.prover. Use only URLs from the list. Reply with {\"shortlist\": [<urls>], \"reason\": <one sentence>} and nothing else.",
       "output_schema": {
         "type": "object",
-        "required": ["shortlist", "reason"],
-        "properties": { "shortlist": { "type": "array", "maxItems": 5, "items": { "type": "string" } }, "reason": { "type": "string", "maxLength": 300 } }
+        "required": [
+          "shortlist",
+          "reason"
+        ],
+        "properties": {
+          "shortlist": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
       },
-      "tools": ["discover", "request_offers", "verifier_agent"]
+      "tools": [
+        "discover",
+        "request_offers",
+        "verifier_agent"
+      ]
     },
     {
       "name": "verifier_agent",
@@ -47,21 +133,127 @@
         "description": "Verifies every offer: the zero-knowledge proof against the registry's verification key, the registry root, the listing binding, the proven claims against the buyer's requirements, and the custody record of the nullifier. Deterministic; a model can never mark a proof as valid."
       },
       "instructions": "Reject any offer whose proof fails, whose root is not the registry's, whose proof is bound to another listing, whose claims do not meet the requirements, or whose nullifier is not held by that vendor.",
-      "tools": ["verify_offer", "check_custody", "negotiator_agent"]
+      "tools": [
+        "verify_offer",
+        "check_custody",
+        "image_agent",
+        "negotiator_agent"
+      ]
+    },
+    {
+      "name": "image_agent",
+      "function": {
+        "description": "Finds an openly licensed reference photo for each offer on Wikimedia Commons (keyless search) and shows it in the hub and in the vendor's page.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "offers"
+          ],
+          "properties": {
+            "offers": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "instructions": "For each offer, write one short Wikimedia Commons search query (2 to 5 plain words) that is likely to find a real photo of that kind of artifact, using only the offer's title and category. Prefer specific names that appear in the title (for example a meteorite's strewn field, a mineral species, a coin type). No quotes, no operators, no brand or vendor names. Reply with {\"queries\": [{\"listing_id\": <id from the input>, \"query\": <string>}]} and nothing else.",
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "queries"
+        ],
+        "properties": {
+          "queries": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "object",
+              "required": [
+                "listing_id",
+                "query"
+              ],
+              "properties": {
+                "listing_id": {
+                  "type": "string"
+                },
+                "query": {
+                  "type": "string",
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        }
+      },
+      "tools": [
+        "find_reference_image"
+      ]
     },
     {
       "name": "negotiator_agent",
       "function": {
         "description": "Negotiates with the vendor the buyer chose, within the buyer's budget, then asks the buyer to approve the order.",
-        "parameters": { "type": "object", "required": ["price", "budget", "round"], "properties": { "price": { "type": "number" }, "budget": { "type": ["number", "null"] }, "round": { "type": "integer" }, "final": { "type": "boolean" } } }
+        "parameters": {
+          "type": "object",
+          "required": [
+            "price",
+            "budget",
+            "round"
+          ],
+          "properties": {
+            "price": {
+              "type": "number"
+            },
+            "budget": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "round": {
+              "type": "integer"
+            },
+            "final": {
+              "type": "boolean"
+            }
+          }
+        }
       },
       "instructions": "You negotiate for the buyer. If price is at or below budget, accept. Otherwise counter: start somewhat below the budget in round 1 and move to at most the budget later. Never offer more than the budget. If the vendor's offer is final and still above budget, walk away. Reply with {\"action\": \"accept\" | \"counter\" | \"walk_away\", \"counter_price\": <number or null>, \"message\": <short polite sentence>} and nothing else.",
       "output_schema": {
         "type": "object",
-        "required": ["action", "message"],
-        "properties": { "action": { "type": "string", "enum": ["accept", "counter", "walk_away"] }, "counter_price": { "type": ["number", "null"] }, "message": { "type": "string", "maxLength": 300 } }
+        "required": [
+          "action",
+          "message"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "counter",
+              "walk_away"
+            ]
+          },
+          "counter_price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
       },
-      "tools": ["send_counter_offer", "place_order", "https://isgudtek.github.io/proove/vendor-northlight/northlight_vendor", "https://isgudtek.github.io/proove/vendor-atelier/atelier_vendor", "https://isgudtek.github.io/proove/vendor-shady/shady_vendor"]
+      "tools": [
+        "send_counter_offer",
+        "place_order",
+        "https://isgudtek.github.io/proove/vendor-northlight/northlight_vendor",
+        "https://isgudtek.github.io/proove/vendor-atelier/atelier_vendor",
+        "https://isgudtek.github.io/proove/vendor-shady/shady_vendor"
+      ]
     }
   ]
 }

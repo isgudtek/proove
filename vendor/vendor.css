@@ -1,6 +1,9 @@
 .notice { margin: 0; padding: 10px 14px; border-radius: 12px; border: 1px solid #f2b84b66; background: #f2b84b14; color: var(--warn); font-weight: 600; }
 .showcase { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; background: var(--oaw-panel); border: 1px solid var(--oaw-line); border-radius: 14px; padding: 12px; }
-.showcase .viewer3d { height: clamp(240px, 38vh, 420px); }
+.photo { position: relative; margin: 0; border-radius: 12px; overflow: hidden; background: #101418; height: clamp(240px, 38vh, 420px); display: flex; flex-direction: column; }
+.photo img { flex: 1; min-height: 0; width: 100%; object-fit: contain; background: #0a0d11; display: block; }
+.photo img[hidden], .photo figcaption[hidden] { display: none; }
+.photo figcaption { padding: 5px 10px; font-size: 11px; color: var(--oaw-muted); border-top: 1px solid var(--oaw-line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .showcase-info { display: grid; gap: 6px; align-content: start; padding: 4px 4px 0; }
 .showcase-info p { margin: 0; }
 .cur-title { margin: 0; font-size: 18px; }
@@ -20,7 +23,7 @@
 .offers li.sold { border-left-color: var(--ok); }
 body.embedded .main > .panel { display: none; }
 body.embedded .showcase { grid-template-columns: 1fr; padding: 8px; gap: 6px; border: 0; background: transparent; }
-body.embedded .showcase .viewer3d { height: max(150px, calc(100vh - 150px)); }
+body.embedded .photo { height: max(150px, calc(100vh - 150px)); }
 body.embedded .proof-box pre, body.embedded #curMeta { display: none; }
 body.embedded .notice { padding: 4px 10px; font-size: 12px; }
 @media (max-width: 900px) { .showcase { grid-template-columns: 1fr; } }

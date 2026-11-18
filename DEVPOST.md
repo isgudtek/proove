@@ -27,8 +27,9 @@ The flow:
    - Atelier, $640: **Verified holder**, over budget
    - Shady Rocks, $390: the proof is valid, but the registry records the item as held by Northlight. **Duplicate item (copied code)**
    - Shady Rocks, $350: the item is not in the registry, so no valid proof exists; the forged proof attached to it **fails verification**
-6. You choose a verified offer, or let the agent pick. `negotiator_agent` bargains within your budget against the vendor's `sales_agent` ($560 → $495 → $530 → **$520**).
-7. Three owners approve three writes: you approve the purchase in the hub, the vendor approves the sale in its pane, the registry approves the custody transfer in its pane. The registry now lists you as the holder, so nobody else can sell that item again.
+6. `image_agent` finds an openly licensed reference photo for every offer on Wikimedia Commons (keyless search) and shows it, credited, in the hub and in the vendor's page.
+7. You choose a verified offer, or let the agent pick. `negotiator_agent` bargains within your budget against the vendor's `sales_agent` ($560 → $495 → $530 → **$520**).
+8. Three owners approve three writes: you approve the purchase in the hub, the vendor approves the sale in its pane, the registry approves the custody transfer in its pane. The registry now lists you as the holder, so nobody else can sell that item again.
 
 **What the proof states.** "I know the secret code of an item in this registry's tree; its category and edition size are these; it weighs at least the buyer's minimum and was certified no earlier than the buyer's year; this proof is bound to this vendor's listing." It does not reveal the code, the exact weight or year, or the item's position in the registry. Its nullifier is the same for every proof about one item, so duplicate listings show up, and custody can be checked without revealing which item it is.
 
@@ -53,6 +54,7 @@ The flow:
 
 - A cheating vendor is caught in two different ways, and both are visible: a **copied code** (valid proof, wrong holder) and a **counterfeit** (forged proof fails).
 - Real proofs, generated and verified in an ordinary browser tab, on a static host, in seconds.
+- A live workflow diagram (pop-out) shows every handoff, RPC call, proof verdict and approval across the five sites; any site pane pops out to full size without breaking the deal.
 - Four sites running side by side, each with its own agents, its own owner and its own approvals, talking only through published manifests and postMessage.
 
 # What we learned
@@ -69,7 +71,7 @@ The flow:
 
 # Built with
 
-noir · barretenberg · ultrahonk · zero-knowledge-proofs · webassembly · javascript · three.js · mozilla-otari · gemini-nano · chrome-prompt-api · postmessage · github-pages · kiro
+noir · barretenberg · ultrahonk · zero-knowledge-proofs · webassembly · javascript · svg · wikimedia-commons-api · mozilla-otari · gemini-nano · chrome-prompt-api · postmessage · github-pages · kiro
 
 ---
 

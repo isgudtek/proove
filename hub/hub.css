@@ -76,3 +76,53 @@ details.pi pre { margin: 6px 0 0; max-height: 180px; overflow: auto; background:
 
 @media (max-width: 1300px) { body.split-on .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); } body.split-on .stream { grid-column: 1 / -1; min-height: 360px; } body.split-on { height: auto; } body.split-on .split-pane { min-height: 720px; } }
 @media (max-width: 900px) { .layout, body.split-on .layout { grid-template-columns: 1fr; } .stream { min-height: 360px; } body { height: auto; } body.split-on .split-pane { min-height: 900px; } .split-frame[data-count] { grid-template-columns: 1fr; } }
+
+/* pop-out: a pane or the workflow panel almost full screen; the iframe stays where it is in the DOM */
+.pop-backdrop { position: fixed; inset: 0; background: #05070acc; z-index: 40; }
+.pop-backdrop[hidden] { display: none; }
+.popped { position: fixed !important; inset: 3vh 3vw; z-index: 41; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px #000c; border: 1px solid var(--oaw-accent) !important; }
+.peer.popped { display: flex; }
+.peer-label .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.peer-label .oaw-btn { padding: 1px 8px; font-size: 11px; text-decoration: none; }
+a.oaw-btn.ghost { color: var(--oaw-muted); }
+
+/* reference photos on offer cards */
+.ophoto { margin: -10px -12px 2px; border-radius: 11px 11px 0 0; overflow: hidden; background: #0a0d11; }
+.ophoto img { display: block; width: 100%; height: 130px; object-fit: cover; }
+.ophoto figcaption { font-size: 10.5px; color: var(--oaw-muted); padding: 3px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* live workflow diagram */
+.flow { display: grid; gap: 6px; }
+.flow-svg { width: 100%; height: auto; max-height: 300px; display: block; font: 600 12px var(--oaw-font); }
+.flow-panel.popped { display: grid; grid-template-rows: auto 1fr; background: var(--oaw-panel); }
+.flow-panel.popped .flow { min-height: 0; grid-template-rows: 1fr auto; }
+.flow-panel.popped .flow-svg { max-height: none; height: 100%; font-size: 12px; }
+.flow-caption { margin: 0; font-size: 12.5px; color: var(--oaw-muted); min-height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-panel.popped .flow-caption { font-size: 15px; color: var(--oaw-ink); padding: 0 6px 6px; }
+.lane rect { fill: #10161d; stroke: var(--oaw-line); stroke-width: 1.2; }
+.lane.hub rect { stroke: #3fcf8e55; }
+.lane.registry rect { stroke: #b48cff55; }
+.lane-title { fill: var(--oaw-muted); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; }
+.node rect { fill: #1c2430; stroke: var(--oaw-line); stroke-width: 1.2; transition: fill .3s, stroke .3s; }
+.node text { fill: var(--oaw-muted); transition: fill .3s; }
+.node.active rect { fill: #7cc4ff22; stroke: #7cc4ff; stroke-width: 2; }
+.node.active text { fill: #e8ecf1; }
+.node.done rect { stroke: #3fcf8e88; }
+.node.done text { fill: #cfe9dc; }
+.node.ok rect { fill: #3fcf8e22; stroke: var(--ok); stroke-width: 2; }
+.node.ok text { fill: var(--ok); }
+.node.bad rect { fill: #ff6b6b22; stroke: var(--bad); stroke-width: 2; }
+.node.bad text { fill: var(--bad); }
+.node.wait rect { fill: #f2b84b22; stroke: var(--warn); stroke-width: 2; animation: flowpulse 1.2s ease-in-out infinite; }
+.node.wait text { fill: var(--warn); }
+@keyframes flowpulse { 50% { fill: #f2b84b55; } }
+.pipe { fill: none; stroke: #2a3546; stroke-width: 2.5; transition: stroke .3s; }
+.pipe.chain { stroke-width: 2; }
+.pipe.hot { stroke: #7cc4ff; }
+.pipe.ok { stroke: #3fcf8e88; }
+.pipe.bad { stroke: #ff6b6b88; stroke-dasharray: 6 5; }
+.pipe.chosen { stroke: var(--ok); stroke-width: 4; }
+.packet { fill: #7cc4ff; transition: transform .8s cubic-bezier(.45, .05, .35, 1); filter: drop-shadow(0 0 5px #7cc4ff); }
+.packet.back { fill: #3fcf8e; filter: drop-shadow(0 0 5px #3fcf8e); }
+.packet.fetch { fill: #b48cff; filter: drop-shadow(0 0 5px #b48cff); }
+.packet.bad { fill: var(--bad); }

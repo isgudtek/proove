@@ -4,10 +4,12 @@
  * -> verifier_agent (zero-knowledge proof + registry checks, deterministic) -> buyer choice -> negotiator_agent
  * -> place_order (your approval) -> vendor confirm_sale (vendor's approval) -> registry record_transfer (registry's approval).
  */
-import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=183292c3d7";
-import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=183292c3d7";
-import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=183292c3d7";
-import * as H from "./hub-logic.js?v=183292c3d7";
+import { AgentRuntime, RpcClient, serveRpc, exposeGlobal, fetchJson, validateManifest, OawError, uid } from "../shared/oaw-core.js?v=b90dd1ce93";
+import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js?v=b90dd1ce93";
+import { CATEGORIES, categoryCode, listingField, PUBLIC_INPUTS } from "../shared/merkle.js?v=b90dd1ce93";
+import { findImage, preload } from "../shared/image-search.js?v=b90dd1ce93";
+import { createFlow } from "./flow.js?v=b90dd1ce93";
+import * as H from "./hub-logic.js?v=b90dd1ce93";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
@@ -43,13 +45,15 @@ let deal = null;
 let busy = false;
 
 const stream = createStream($("#stream"));
+let flow = { local() {}, remote() {}, verdict() {}, chosen() {}, reset() {} };
+const buildFlow = () => { flow = createFlow($("#flow"), { registryUrl, vendors, label: (u) => shortName(u) }); };
 const approve = createApproval();
 const consent = createConsent();
 
 /* --------------------------------------------------------- zero knowledge */
 
 let zkMod = null;
-const zk = () => (zkMod ??= import("../shared/zk-client.js?v=183292c3d7"));
+const zk = () => (zkMod ??= import("../shared/zk-client.js?v=b90dd1ce93"));
 let zkReady = null;
 function warmZk() {
   zkReady ??= (async () => {
@@ -77,7 +81,11 @@ function frameFor(url) {
     u.searchParams.set("embedded", "1");
     if (BUILD !== "dev") u.searchParams.set("v", BUILD); // never reuse a stale cached page
     const el = h("iframe", { src: u.href, title: `${shortName(key)} (live)`, class: "peer-frame" });
-    const wrap = h("div", { class: "peer" }, h("div", { class: "peer-label" }, h("strong", { text: shortName(key) }), h("span", { class: "oaw-muted small", text: ` ${host(key)}${new URL(key).pathname}` })), el);
+    const wrap = h("div", { class: "peer" });
+    wrap.append(h("div", { class: "peer-label" },
+      h("strong", { text: shortName(key) }), h("span", { class: "oaw-muted small grow", text: ` ${host(key)}${new URL(key).pathname}` }),
+      h("button", { class: "oaw-btn small pop-btn", type: "button", text: "Pop out", "aria-label": `Pop out ${shortName(key)}`, onclick: () => togglePop(wrap, key) }),
+      h("a", { class: "oaw-btn small ghost", href: `${key}/`, target: "_blank", rel: "noopener", text: "New tab", title: "Opens a separate copy of the site (not connected to this deal)" })), el);
     f = { el, wrap };
     frames.set(key, f);
     $("#splitFrame").append(wrap);
@@ -95,6 +103,7 @@ function openSplit(urls) {
   $("#splitBtn").textContent = "Close Split-View";
 }
 function closeSplit() {
+  if (popped?.key) togglePop(popped.target);
   document.body.classList.remove("split-on");
   for (const [key, f] of frames) { f.wrap.remove(); const c = clients.get(key); if (c) c.ready = false; }
   frames.clear();
@@ -102,6 +111,30 @@ function closeSplit() {
   $("#splitBtn").textContent = "Open Split-View";
 }
 $("#splitBtn").addEventListener("click", () => (document.body.classList.contains("split-on") ? closeSplit() : openSplit([registryUrl, ...vendors])));
+/* Pop out: show one live pane (or the workflow) almost full screen. The iframe is never moved in the DOM, so its
+   page, agents and RPC connection stay alive; the page is only asked to switch to its normal, non-compact layout. */
+let popped = null;
+function viewMode(key, embedded) { const f = key && frames.get(key); try { f?.el.contentWindow?.postMessage({ type: "OAW_VIEW", embedded }, originOf(key)); } catch { /* frame gone */ } }
+function togglePop(target, key = null) {
+  const was = popped;
+  if (was) {
+    was.target.classList.remove("popped");
+    was.target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Pop out");
+    viewMode(was.key, true);
+    popped = null;
+  }
+  if (was?.target !== target) {
+    target.classList.add("popped");
+    target.querySelector(".pop-btn, #flowPop")?.replaceChildren("Close ✕");
+    viewMode(key, false);
+    popped = { target, key };
+  }
+  $("#popBackdrop").hidden = !popped;
+}
+$("#popBackdrop").addEventListener("click", () => popped && togglePop(popped.target));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && popped) togglePop(popped.target); });
+$("#flowPop").addEventListener("click", () => togglePop($("#flowPanel")));
+
 const peerWindow = (url) => frames.get(trimUrl(url))?.el.contentWindow || null;
 
 async function peer(url) {
@@ -149,12 +182,13 @@ const pendingAt = new Map();
 function onRemote(ev, key) {
   if (ev.type === "rpc" && ev.direction === "in") return; // our own request echoed back
   stream.add(ev, { remote: shortName(key) });
+  flow.remote(ev, key);
   if (ev.type === "approval") {
     if (ev.state === "pending") pendingAt.set(key, `${shortName(key)}: approve or reject "${ev.tool}"${ev.price != null ? ` (${money(ev.price)})` : ""}`);
     else pendingAt.delete(key);
     const bar = $("#splitAttention");
     bar.hidden = !pendingAt.size;
-    bar.textContent = pendingAt.size ? `Action needed · ${[...pendingAt.values()].join(" · ")} in its pane →` : "";
+    bar.textContent = pendingAt.size ? `Action needed · ${[...pendingAt.values()].join(" · ")} in its pane → (Pop out makes it bigger)` : "";
     frames.get(key)?.wrap.classList.toggle("attention", ev.state === "pending");
   }
 }
@@ -230,6 +264,15 @@ const agentImpl = {
       return { verified: offers.filter((o) => o.verdict.ok).length, rejected: offers.filter((o) => !o.verdict.ok).length };
     },
   },
+  image_agent: {
+    prompt: ({ offers }) => `Offers:\n${JSON.stringify(offers, null, 1)}`,
+    deterministic: ({ offers }) => ({ queries: offers.map((o) => ({ listing_id: o.listing_id, query: "" })) }), // empty -> the rule-based queries
+    normalize: (out, { offers }) => {
+      const ids = new Set(offers.map((o) => o.listing_id));
+      const got = new Map((Array.isArray(out?.queries) ? out.queries : []).filter((q) => ids.has(q?.listing_id)).map((q) => [q.listing_id, String(q.query || "").replace(/["'<>:]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80)]));
+      return { queries: offers.map((o) => ({ listing_id: o.listing_id, query: got.get(o.listing_id) || "" })) };
+    },
+  },
   negotiator_agent: {
     prompt: ({ price, budget, round, final, history }) => `Round ${round} of ${H.MAX_ROUNDS}. Vendor's current price: ${price}. Budget: ${budget}. Final offer: ${!!final}.\nHistory: ${JSON.stringify(history)}`,
     deterministic: (input) => H.negotiatorDeterministic(input),
@@ -245,6 +288,8 @@ const tools = {
       const reg = await discoverOne(registryUrl, "registry");
       const list = [];
       for (const url of vendors) list.push(await discoverOne(url, "vendor"));
+      buildFlow();
+      flow.local({ type: "handoff", from: "intake_agent", to: "discovery_agent" });
       return { registry: { ok: reg.ok && !!registry, error: reg.error || null, root: registry?.root }, vendors: list.map(({ manifest: _m, network: _n, checks: _c, ...s }) => s) };
     },
   },
@@ -272,6 +317,23 @@ const tools = {
       const custody = crypto.ok ? (await runtime.callTool("check_custody", { nullifier: String(offer.public_inputs[6]) })).result : null;
       const binding = await listingField(offer.vendor, offer.listing_id);
       return { ...H.verdict({ offer, crypto, registry, custody, listingField: binding, req: req(), categoryCode }), verify_ms: crypto.ms, custody };
+    },
+  },
+  find_reference_image: {
+    effect: "read", title: "Find a reference photo",
+    input_schema: { type: "object", required: ["listing_id"], properties: { listing_id: { type: "string" }, query: { type: "string" } } },
+    async handler({ listing_id, query }) {
+      const o = deal?.offers.find((x) => x.listing_id === listing_id);
+      if (!o) throw new OawError("NO_OFFER", `No offer ${listing_id}.`);
+      const img = await findImage(o.item, query ? [query] : []);
+      if (img) await preload(img.thumb);
+      o.image = img || false;
+      drawDeal();
+      if (!img) return { found: false };
+      runtime.emit({ type: "note", agent: "image_agent", text: `${o.item.title}: "${img.query}" → ${img.title} (${img.license}, ${img.author})` });
+      const by = runtime.describeProvider().id === "demo" ? "the buyer's image_agent (rule-based query)" : "the buyer's image_agent";
+      await rpc(o.vendor_url, "callTool", { tool: "show_reference_image", args: { listing_id, image: img, found_by: by } }).catch(() => {});
+      return { found: true, title: img.title, license: img.license, author: img.author, source: img.source };
     },
   },
   send_counter_offer: {
@@ -321,7 +383,7 @@ const tools = {
 };
 
 const runtime = new AgentRuntime({ site: "hub", manifest, network, agentImpl, tools, settingsKey: "proove.hub.settings.v1", approve });
-runtime.on((e) => stream.add(e));
+runtime.on((e) => { stream.add(e); flow.local(e); });
 
 /* ------------------------------------------------------------- deal flow */
 
@@ -395,7 +457,13 @@ async function runDeal(prompt) {
       f.wrap.classList.toggle("rejected", mine.length > 0 && mine.every((o) => !o.verdict.ok));
     }
     const options = deal.offers.filter((o) => o.verdict.ok);
+    for (const r of deal.vendorRows) { const mine = deal.offers.filter((o) => o.vendor_url === r.url); if (mine.length) flow.verdict(r.url, mine.some((o) => o.verdict.ok)); }
     runtime.emit({ type: "note", agent: "verifier_agent", text: `${v.verified} verified, ${v.rejected} rejected.` });
+    try { // reference photos: nice to have, never blocks the deal
+      runtime.emit({ type: "handoff", from: "verifier_agent", to: "image_agent" });
+      const qs = await runtime.runAgent("image_agent", { offers: deal.offers.map((o) => ({ listing_id: o.listing_id, title: o.item?.title, category: o.item?.category })) }, { from: "verifier_agent" });
+      await Promise.all(qs.queries.map((q) => runtime.callTool("find_reference_image", q)));
+    } catch (e) { runtime.emit({ type: "note", agent: "image_agent", text: `Reference photos skipped: ${e.message}` }); }
     step("Verify", options.length ? "done" : "failed");
     if (!options.length) {
       deal.result = { ok: false, text: "No offer passed verification. Nothing can be bought safely." };
@@ -417,6 +485,8 @@ async function runDeal(prompt) {
     deal.first_price = o.price;
     deal.history.push({ by: "vendor", price: o.price, note: "listed price" });
     for (const [key, f] of frames) f.wrap.classList.toggle("chosen", key === o.vendor_url);
+    flow.chosen(o.vendor_url);
+    if (o.image) rpc(o.vendor_url, "callTool", { tool: "show_reference_image", args: { listing_id: o.listing_id, image: o.image } }).catch(() => {});
     step("Choose", "done");
 
     step("Negotiate", "active");
@@ -499,6 +569,10 @@ function drawDeal() {
   ].filter(Boolean));
 }
 
+// One <img> element per photo URL, reused across re-renders, so a redraw never restarts a download.
+const photoEls = new Map();
+const photoEl = (img) => { let e = photoEls.get(img.thumb); if (!e) { e = h("img", { src: img.thumb, alt: `Reference photo: ${img.title}` }); photoEls.set(img.thumb, e); } return e; };
+
 /** Offer cards: what each proof proves, the verifier's verdict, and the buttons while a choice is pending. */
 function drawOffers() {
   const budget = deal.requirements?.max_budget;
@@ -515,6 +589,7 @@ function drawOffers() {
       const idx = waiting ? deal.choice.options.indexOf(x) : -1;
       const proven = [catLabel(big(pi.category ?? x.public_inputs?.[1])), big(pi.min_measure) ? `≥ ${big(pi.min_measure)} g` : null, big(pi.min_year) ? `certified ≥ ${big(pi.min_year)}` : null, big(pi.edition_size) > 1 ? `edition of ${big(pi.edition_size)}` : "one of a kind"].filter(Boolean);
       return h("div", { class: `ocard ${v ? (v.ok ? "ok" : "bad") : ""} ${chosen ? "chosen" : ""} ${deal.chosen && !chosen ? "passed" : ""}` },
+        x.image ? h("figure", { class: "ophoto" }, photoEl(x.image), h("figcaption", {}, "Reference photo, not the item · ", h("a", { href: x.image.source, target: "_blank", rel: "noopener", text: x.image.author }), ` · ${x.image.license}`)) : x.image === false ? h("p", { class: "oaw-muted small", text: "No openly licensed reference photo found." }) : null,
         h("p", { class: "oshop", text: x.vendor_name }),
         h("p", { class: "otitle", text: x.item?.title || x.listing_id }),
         h("p", { class: "price", text: money(x.price) }),
@@ -625,6 +700,7 @@ exposeGlobal({
 drawDeal();
 drawPeers();
 drawOrders();
+buildFlow();
 await runtime.probeNano();
 stream.add({ type: "note", text: `Build ${BUILD} · network "${network.metadata.name}" · ${runtime.describeProvider().label} · registry ${host(registryUrl)}${new URL(registryUrl).pathname.replace(/\/$/, "")} · vendors: ${vendors.map((u) => host(u) + new URL(u).pathname.replace(/\/$/, "")).join(", ")} · you are ${buyerRef}` });
 if (skipped.length) stream.add({ type: "note", text: `Ignored saved localhost vendor(s) on this public page: ${skipped.join(", ")}` });

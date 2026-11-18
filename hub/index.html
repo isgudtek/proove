@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proove Buyer Hub</title>
   <meta name="description" content="Buy certified unique artifacts from agentic vendors. Every offer carries a zero-knowledge proof of possession that this hub verifies in your browser.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; frame-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob: https://upload.wikimedia.org https://thumb.wikimedia.org; connect-src 'self' data: https: http://localhost:* http://127.0.0.1:*; frame-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
   <link rel="alternate" type="application/json" href="agent-manifest.json" title="Agent manifest">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0d11'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%233fcf8e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../shared/oaw-ui.css">
@@ -41,6 +41,11 @@
         </form>
       </section>
 
+      <section id="flowPanel" class="panel flow-panel" aria-label="Live workflow">
+        <h2 class="ph"><span>Live workflow <span class="oaw-muted small">· handoffs, RPC calls, proofs and approvals across the five sites</span></span><button id="flowPop" class="oaw-btn small" type="button">Pop out</button></h2>
+        <div id="flow" class="flow"></div>
+      </section>
+
       <section class="panel" aria-label="Current deal">
         <h2 class="ph">Deal</h2>
         <div id="deal" class="deal" aria-live="polite"></div>
@@ -73,6 +78,7 @@
     <aside id="stream" class="oaw-stream stream" aria-label="Agent Network Execution Stream"></aside>
   </div>
 
+  <div id="popBackdrop" class="pop-backdrop" hidden></div>
   <script type="module" src="app.js"></script>
 </body>
 </html>

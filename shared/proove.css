@@ -53,8 +53,6 @@ textarea, .panel input, .panel select { font: inherit; padding: 9px 11px; border
 .badge-zk.warn { color: var(--warn); border-color: #f2b84b55; background: #f2b84b14; }
 .badge-zk.pending { color: var(--oaw-muted); border-color: var(--oaw-line); }
 
-.viewer3d { position: relative; border-radius: 12px; overflow: hidden; background: #101418; min-height: 220px; }
-.viewer3d canvas { display: block; width: 100% !important; height: 100% !important; }
 .v-empty { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; color: var(--oaw-muted); padding: 20px; }
 
 table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; }

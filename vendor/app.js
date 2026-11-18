@@ -5,11 +5,14 @@
 import { AgentRuntime, serveRpc, exposeGlobal, fetchJson, OawError, uid } from "../shared/oaw-core.js";
 import { h, $, money, createStream, createApproval, createConsent, createSettings, createStatusPill, createInspector } from "../shared/oaw-ui.js";
 import { CATEGORIES, listingField } from "../shared/merkle.js";
+import { safeImage } from "../shared/image-search.js";
 import * as V from "./vendor-logic.js";
 
 const BUILD = document.querySelector('meta[name="oaw-build"]')?.content || "dev";
-const embedded = window.parent !== window || new URLSearchParams(location.search).has("embedded");
+let embedded = window.parent !== window || new URLSearchParams(location.search).has("embedded");
 document.body.classList.toggle("embedded", embedded);
+// The hub's "Pop out" shows this page full size: it asks for the normal (non-compact) layout. Only the parent may ask.
+window.addEventListener("message", (e) => { if (e.source === window.parent && e.data?.type === "OAW_VIEW") { embedded = !!e.data.embedded; document.body.classList.toggle("embedded", embedded); } });
 const get = async (f) => (await fetch(`./${f}`, { cache: "no-store" })).json();
 const [shop, manifest, vault] = await Promise.all([get("shop.json"), get("agent-manifest.json"), get("vault.json")]);
 const network = await get(manifest.networks[0].hocon);
@@ -53,16 +56,35 @@ const catalog = () => items.map(({ secret, path, bits, index, cheat, ...pub }) =
 const listings = new Map(); // listing_id -> { item, buyer, price, rounds, status, history, proof }
 let current = null;
 
-/* -------------------------------------------------------- 3D */
+/* -------------------------------------------------------- reference photo */
 
-let viewer = null, pendingItem = null;
-import("../shared/specimen.js").then(({ createSpecimenViewer }) => {
-  viewer = createSpecimenViewer($("#viewer"));
-  if (pendingItem) showItem(pendingItem);
-}).catch((e) => { $("#vEmpty").textContent = `3D preview unavailable (${e.message}).`; });
+// A reference photo of the artifact type from Wikimedia Commons: pushed by the buyer's hub (its image_agent picks
+// the query), or found here with a rule-based query when the vendor proves an item on its own page.
+const photos = new Map(); // item id -> photo
+function drawPhoto(item) {
+  const p = photos.get(item?.id);
+  const img = $("#photoImg"), cap = $("#photoCap");
+  $("#vEmpty").hidden = !!p;
+  if (!item) $("#vEmpty").textContent = "The artifact a buyer asks for will appear here";
+  else if (!p) $("#vEmpty").textContent = embedded ? "The buyer's image_agent sends a reference photo after verification" : "Looking for a reference photo…";
+  img.hidden = cap.hidden = !p;
+  if (!p) { img.removeAttribute("src"); return; }
+  img.src = p.thumb;
+  img.alt = `Reference photo: ${p.title}`;
+  cap.replaceChildren("Reference photo of this type of artifact, not the certified item · ", h("a", { href: p.source, target: "_blank", rel: "noopener", text: p.author }), ` · ${p.license}${p.by ? ` · found by ${p.by}` : ""}`);
+}
+async function ensurePhoto(item) {
+  if (photos.has(item.id)) return;
+  const { findImage } = await import("../shared/image-search.js");
+  const p = await findImage(item).catch(() => null);
+  if (p && !photos.has(item.id)) photos.set(item.id, { ...p, by: "this shop's rule-based search" });
+  if (!p && current?.id === item.id) $("#vEmpty").textContent = "No openly licensed reference photo found";
+  if (current?.id === item.id) drawPhoto(item);
+}
 function showItem(item, proofInfo) {
   current = item;
-  if (viewer) { viewer.show(item); $("#vEmpty").hidden = true; } else pendingItem = item;
+  drawPhoto(item);
+  if (!embedded) ensurePhoto(item);
   $("#curKicker").textContent = CATEGORIES[item.category_code]?.label || item.category;
   $("#curTitle").textContent = item.title;
   $("#curMeta").textContent = `${item.measure > 1 ? `${item.measure} g · ` : ""}certified ${item.cert_year}${item.edition_size > 1 ? ` · edition of ${item.edition_size}` : ""} · ${money(item.list)}`;
@@ -204,6 +226,18 @@ const tools = {
       runtime.emit({ type: "negotiation", text: r.accepted ? `Vendor accepts ${money(l.price)}` : `Vendor counters ${money(l.price)}${r.final ? " (final offer)" : ""}` });
       drawOffers();
       return { listing_id, price: l.price, accepted: r.accepted, final: r.final, message: r.policy ? V.salesDeterministic({ counter_price: counter, floor_price: floor, current: l.price }).message : out.message };
+    },
+  },
+  show_reference_image: {
+    effect: "read", rpc: true, title: "Show a reference photo",
+    input_schema: { type: "object", required: ["listing_id", "image"], properties: { listing_id: { type: "string" }, image: { type: "object" }, found_by: { type: "string" } } },
+    handler({ listing_id, image, found_by }) {
+      const l = need(listing_id);
+      const p = safeImage(image);
+      if (!p) throw new OawError("BAD_IMAGE", "Only openly licensed Wikimedia Commons images are shown.");
+      photos.set(l.item.id, { ...p, by: String(found_by || "the buyer's image_agent").slice(0, 60) });
+      showItem(l.item, l.proof);
+      return { shown: true, item: l.item.id };
     },
   },
   confirm_sale: {

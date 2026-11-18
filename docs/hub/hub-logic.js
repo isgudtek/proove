@@ -2,7 +2,7 @@
  * hub-logic.js: buyer-side rules for Proove (no DOM). Requirements parsing, offer verification verdicts,
  * ranking and buyer negotiation policy. The model proposes; these functions decide.
  */
-import { CATEGORIES, PUBLIC_INPUTS, sameField } from "../shared/merkle.js?v=183292c3d7";
+import { CATEGORIES, PUBLIC_INPUTS, sameField } from "../shared/merkle.js?v=b90dd1ce93";
 
 export const MAX_ROUNDS = 3;
 const KEYS = Object.values(CATEGORIES).map((c) => c.key);

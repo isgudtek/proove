@@ -7,7 +7,7 @@
   "networks": [
     {
       "name": "proove_hub",
-      "description": "Request -> requirements -> vendor discovery -> proven offers -> verification -> choice -> negotiation -> approved order and registry transfer.",
+      "description": "Request -> requirements -> vendor discovery -> proven offers -> verification -> reference photos -> choice -> negotiation -> approved order and registry transfer.",
       "front_man": "intake_agent",
       "hocon": "hub.network.json"
     }
@@ -43,6 +43,10 @@
       "role": "Verifies every zero-knowledge proof, root, listing binding, claims and custody (rule-based)"
     },
     {
+      "name": "image_agent",
+      "role": "Writes a search query per offer and shows an openly licensed Wikimedia Commons reference photo (no key needed for the search)"
+    },
+    {
       "name": "negotiator_agent",
       "role": "Negotiates with the chosen vendor within budget, triggers human approval"
     }
@@ -75,6 +79,13 @@
       "requires_approval": false,
       "rpc_callable": false,
       "description": "Ask the registry who holds a nullifier."
+    },
+    {
+      "name": "find_reference_image",
+      "effect": "read",
+      "requires_approval": false,
+      "rpc_callable": false,
+      "description": "Search Wikimedia Commons (keyless) for an openly licensed reference photo of an offer's artifact type, show it with author and license, and send it to the vendor's page. Never the certified item itself."
     },
     {
       "name": "send_counter_offer",

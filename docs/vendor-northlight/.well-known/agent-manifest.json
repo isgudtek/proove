@@ -96,6 +96,13 @@
       }
     },
     {
+      "name": "show_reference_image",
+      "effect": "read",
+      "requires_approval": false,
+      "rpc_callable": true,
+      "description": "Display an openly licensed Wikimedia Commons reference photo for one of this shop's listings (sent by the buyer's image_agent). Only Wikimedia-hosted images with a public-domain or CC license are accepted."
+    },
+    {
       "name": "confirm_sale",
       "effect": "write",
       "requires_approval": true,

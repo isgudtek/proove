@@ -12,7 +12,7 @@ Five static sites, each a conforming *open agentic website* (worldwide-agentic-w
 | `vendor-northlight/` · Northlight Collectibles | Honest vendor | `curator_agent`, `prover_agent` (rule-based, ZK), `sales_agent` |
 | `vendor-atelier/` · Atelier Unique | Honest vendor | same runtime, its own vault and prices |
 | `vendor-shady/` · Shady Rocks | **Deliberately dishonest demo vendor** | same runtime; lists a copied item and a counterfeit |
-| `hub/` · Proove Buyer Hub | Buyer side | `intake_agent`, `discovery_agent`, `verifier_agent` (rule-based), `negotiator_agent` |
+| `hub/` · Proove Buyer Hub | Buyer side | `intake_agent`, `discovery_agent`, `verifier_agent` (rule-based), `image_agent`, `negotiator_agent` |
 
 ## The demo in one run
 
@@ -32,8 +32,18 @@ Hub prompt: *"A certified meteorite fragment, at least 50 g, budget $520"*.
    - Atelier, pallasite, $640: **verified holder**, over budget
    - Shady Rocks, "bargain" meteorite, $390: valid proof, but the nullifier is registered to Northlight. **Rejected: duplicate item (copied code).**
    - Shady Rocks, "Martian meteorite", $350: not in the registry, so it cannot be proven; the vendor attaches a forged proof. **Rejected: proof failed.**
-6. You choose an offer (or "Let the agent pick"). **negotiator_agent** negotiates within the budget ($560 → $520) against the vendor's `sales_agent`, which enforces its floor.
-7. Three separate approvals: you approve `place_order` in the hub, the vendor's owner approves `confirm_sale` in the vendor pane, the registry's owner approves `record_transfer` in the registry pane. The registry now lists you as the holder; neither Northlight nor Shady can sell that item again.
+6. **image_agent** writes a search query per offer (a model with your key, or a rule-based query in Demo Mode) and finds an openly licensed reference photo on Wikimedia Commons. The photo appears on the offer card and in the vendor's pane, with author and license.
+7. You choose an offer (or "Let the agent pick"). **negotiator_agent** negotiates within the budget ($560 → $520) against the vendor's `sales_agent`, which enforces its floor.
+8. Three separate approvals: you approve `place_order` in the hub, the vendor's owner approves `confirm_sale` in the vendor pane, the registry's owner approves `record_transfer` in the registry pane. The registry now lists you as the holder; neither Northlight nor Shady can sell that item again.
+
+## Watching it work
+
+- **Live workflow:** a diagram of the five sites and their agents. Nodes light up on each handoff, packets travel along the pipes for every manifest fetch and RPC call, approvals pulse amber, and verification colours each vendor green or red. **Pop out** shows it full screen.
+- **Split view:** the registry and the three vendors run live side by side. **Pop out** on any pane shows that site full size, in its normal layout with its own agent stream, without reloading it, so the RPC connection and the deal continue. **New tab** opens a separate copy.
+
+## Reference photos
+
+Photos come from a keyless [Wikimedia Commons API](https://commons.wikimedia.org/w/api.php) search at run time; no image is stored in this repo. Only public-domain, CC0, CC BY and CC BY-SA results are used, and each is shown with its author, license and a link to its Commons page. They show the *type* of artifact and are labelled "Reference photo, not the certified item". If you set an Otari key in the hub's Model settings, `image_agent` writes the queries with the model. The key is never sent to the vendors; they only receive the photo record, and accept it only if it points at Wikimedia's image hosts with an open license.
 
 ## What the proof says
 
@@ -81,7 +91,7 @@ No model key is needed: Demo Mode answers deterministically. In **Model settings
 circuits/possession     Noir possession circuit
 circuits/hasher         same Pedersen hashes, executed (not proved) to build the tree off-circuit
 shared/                 oaw-core.js (runtime, RPC, manifest validation), oaw-ui.js, merkle.js, zk-client.js,
-                        specimen.js (Three.js artifact viewer), proove.css
+                        image-search.js (Commons search), proove.css
 shared/zk/              compiled circuits, bundled noir_js + bb.js, workers, WASM, self-hosted CRS (8 MB)
 registry/               registry site + registry-data.json + custody.json
 vendor/                 shared vendor storefront code; vendor-*/ add shop.json, manifest, network, vault, theme
@@ -92,7 +102,7 @@ docs/                   GitHub Pages build output
 
 ## Security notes
 
-- Each site's Content-Security-Policy allows only its own scripts (plus `'wasm-unsafe-eval'` for the prover WASM, and jsDelivr on the vendor and registry pages).
+- Each site's Content-Security-Policy allows only its own scripts (plus `'wasm-unsafe-eval'` for the prover WASM); images only from itself and Wikimedia's image hosts.
 - RPC: apart from `ping` and `manifest`, requests are answered only after an origin check (manifest `trusted_origins`) or the user's consent; each RPC client also checks `event.source`, so a reply from another frame on the same origin is ignored.
 - Every write (`place_order`, `confirm_sale`, `record_transfer`) pauses for its own site owner's approval; the hub's policy never orders above budget or an unverified offer.
 - The CRS is self-hosted; no third-party CDN is contacted for proving.
@@ -104,7 +114,7 @@ Proove is MIT-licensed (see [LICENSE](LICENSE)). Third-party components:
 - [Noir](https://github.com/noir-lang/noir): `@noir-lang/noir_js`, `noir_wasm`, `noirc_abi`, `types` (MIT OR Apache-2.0), `acvm_js` (MIT), by Aztec Labs and contributors
 - [Barretenberg `@aztec/bb.js`](https://github.com/AztecProtocol/aztec-packages) 5.3.0 (MIT), UltraHonk prover and verifier
 - Aztec's published CRS files (public BN254 and Grumpkin parameters from crs.aztec-cdn.foundation), trimmed to 2^17 points and self-hosted
-- [Three.js](https://threejs.org/) 0.187.0 (MIT), loaded from jsDelivr
+- Reference photos: Wikimedia Commons contributors, under each photo's own open license (shown with the photo), fetched at run time
 - [esbuild](https://esbuild.github.io/) (MIT), build only
 
 Built for the Cognizant AI Lab **Open Agentic Web Challenge** with Kiro CLI.
